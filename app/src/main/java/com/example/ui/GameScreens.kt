@@ -23,7 +23,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -580,7 +582,7 @@ fun CabinView(state: GameUiState, viewModel: GameViewModel) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .horizontalScroll(scrollState)
+                .horizontalScroll(scrollState, enabled = zoomedNode == null)
         ) {
             Box(
                 modifier = Modifier
@@ -812,6 +814,24 @@ fun CabinView(state: GameUiState, viewModel: GameViewModel) {
             }
         }
 
+        // --- APPROACH VIGNETTE: sells the sensation of stepping toward the object ---
+        val zoomProgress = ((scale - 1f) / 2.5f).coerceIn(0f, 1f)
+        if (zoomProgress > 0f) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.radialGradient(
+                            colors = listOf(
+                                Color.Transparent,
+                                Color.Transparent,
+                                CyberObsidian.copy(alpha = zoomProgress * 0.75f)
+                            )
+                        )
+                    )
+            )
+        }
+
         // --- SWIPE PROMPT HUD overlay (fades out when scrolled) ---
         AnimatedVisibility(
             visible = scrollState.value < 50 && zoomedNode == null,
@@ -1000,54 +1020,100 @@ fun StellarViewportObject(
         label = "viewport_glow"
     )
 
+    // Slow starfield drift inside the glass, sold separately from the frame glow
+    val infiniteTransition2 = rememberInfiniteTransition(label = "viewport_stars")
+    val drift by infiniteTransition2.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(20000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "star_drift"
+    )
+
     Column(
         modifier = modifier
             .width(130.dp)
             .clickable(onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // A physical brass-rimmed porthole set into the hull, not a bordered card
         Box(
-            modifier = Modifier
-                .size(width = 120.dp, height = 75.dp)
-                .background(Color.Black.copy(alpha = 0.4f), RoundedCornerShape(4.dp))
-                .border(2.dp, CyberCyan.copy(alpha = glowAlpha), RoundedCornerShape(4.dp))
-                .padding(4.dp),
+            modifier = Modifier.size(110.dp),
             contentAlignment = Alignment.Center
         ) {
             Canvas(modifier = Modifier.fillMaxSize()) {
-                // Draw a beautiful custom cybernetic overlay
-                drawRect(
-                    color = CyberCyan.copy(alpha = 0.15f),
-                    size = size
-                )
-                // Reticle lines
-                drawLine(
-                    color = CyberCyan.copy(alpha = 0.4f),
-                    start = Offset(0f, size.height / 2),
-                    end = Offset(size.width, size.height / 2),
-                    strokeWidth = 1f
-                )
-                // Draw blinking status indicator dot
+                val radius = size.minDimension / 2f
+                val center = Offset(size.width / 2f, size.height / 2f)
+
+                // Outer hull rim (brushed metal ring)
                 drawCircle(
-                    color = CyberCyan,
-                    radius = 3f,
-                    center = Offset(size.width - 10f, 10f)
+                    brush = Brush.linearGradient(
+                        colors = listOf(Color(0xFF6B7684), Color(0xFF232B33), Color(0xFF6B7684))
+                    ),
+                    radius = radius,
+                    center = center,
+                    style = Stroke(width = radius * 0.16f)
                 )
-            }
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(
-                    imageVector = Icons.Default.Visibility,
-                    contentDescription = "Viewport",
-                    tint = CyberCyan,
-                    modifier = Modifier.size(24.dp)
+
+                // Rivets around the rim
+                for (i in 0 until 8) {
+                    val angle = (i * 45f) * (Math.PI / 180f)
+                    val rx = center.x + (radius * 0.92f) * kotlin.math.cos(angle).toFloat()
+                    val ry = center.y + (radius * 0.92f) * kotlin.math.sin(angle).toFloat()
+                    drawCircle(color = Color(0xFF9AA5B1), radius = radius * 0.045f, center = Offset(rx, ry))
+                }
+
+                // Glass interior - deep space gradient
+                drawCircle(
+                    brush = Brush.radialGradient(
+                        colors = listOf(Color(0xFF0B1524), Color(0xFF01030A)),
+                        center = center,
+                        radius = radius * 0.82f
+                    ),
+                    radius = radius * 0.8f,
+                    center = center
                 )
-                Text(
-                    text = "VIEWPORT ACTIVE",
-                    color = CyberCyan,
-                    fontSize = 8.sp,
-                    fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight.Bold
+
+                // Faint fixed starfield, gently drifting
+                val rnd = Random(42)
+                for (i in 0 until 22) {
+                    val baseX = rnd.nextFloat()
+                    val sx = (((baseX + drift * 0.15f) % 1f)) * size.width
+                    val sy = rnd.nextFloat() * size.height
+                    val dx = sx - center.x
+                    val dy = sy - center.y
+                    if (dx * dx + dy * dy < (radius * 0.78f) * (radius * 0.78f)) {
+                        drawCircle(
+                            color = Color.White.copy(alpha = 0.3f + rnd.nextFloat() * 0.5f),
+                            radius = 0.8f + rnd.nextFloat() * 1.2f,
+                            center = Offset(sx, sy)
+                        )
+                    }
+                }
+
+                // Glass specular highlight streak
+                drawArc(
+                    color = Color.White.copy(alpha = glowAlpha * 0.35f),
+                    startAngle = 200f,
+                    sweepAngle = 50f,
+                    useCenter = false,
+                    topLeft = Offset(center.x - radius * 0.6f, center.y - radius * 0.6f),
+                    size = androidx.compose.ui.geometry.Size(radius * 1.2f, radius * 1.2f),
+                    style = Stroke(width = radius * 0.1f, cap = StrokeCap.Round)
                 )
+
+                // Inner brass bezel
+                drawCircle(
+                    color = CyberCyan.copy(alpha = glowAlpha * 0.7f),
+                    radius = radius * 0.8f,
+                    center = center,
+                    style = Stroke(width = radius * 0.03f)
+                )
+
+                // Status light, top-right of the frame
+                drawCircle(color = CyberCyan, radius = radius * 0.06f, center = Offset(center.x + radius * 0.68f, center.y - radius * 0.68f))
             }
         }
         Spacer(modifier = Modifier.height(4.dp))
@@ -1077,14 +1143,42 @@ fun AiTerminalObject(
     onClick: () -> Unit
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "ai_terminal")
-    val rotation by infiniteTransition.animateFloat(
+    val ringRotation by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 360f,
         animationSpec = infiniteRepeatable(
-            animation = tween(4000, easing = LinearEasing),
+            animation = tween(6000, easing = LinearEasing),
             repeatMode = RepeatMode.Restart
         ),
-        label = "rotation"
+        label = "ring_rotation"
+    )
+    val ringRotation2 by infiniteTransition.animateFloat(
+        initialValue = 360f,
+        targetValue = 0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(4200, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "ring_rotation_2"
+    )
+    val coreBreath by infiniteTransition.animateFloat(
+        initialValue = 0.7f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1600, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "core_breath"
+    )
+    // Floats in place, untethered - a holographic projection, not a mounted panel
+    val hover by infiniteTransition.animateFloat(
+        initialValue = -4f,
+        targetValue = 4f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2200, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "hover"
     )
 
     Column(
@@ -1095,28 +1189,48 @@ fun AiTerminalObject(
     ) {
         Box(
             modifier = Modifier
-                .size(70.dp)
-                .background(Color.Black.copy(alpha = 0.4f), RoundedCornerShape(50))
-                .border(2.dp, MatrixGreen, RoundedCornerShape(50))
-                .padding(6.dp),
+                .offset(y = hover.dp)
+                .size(78.dp),
             contentAlignment = Alignment.Center
         ) {
             Canvas(modifier = Modifier.fillMaxSize()) {
-                // Floating concentric ring
+                val center = Offset(size.width / 2f, size.height / 2f)
+                val r = size.minDimension / 2f
+
+                // Gyroscopic orbit rings - like a holographic navigation core
+                rotate(degrees = ringRotation, pivot = center) {
+                    drawOval(
+                        color = MatrixGreen.copy(alpha = 0.55f),
+                        topLeft = Offset(center.x - r * 0.95f, center.y - r * 0.32f),
+                        size = androidx.compose.ui.geometry.Size(r * 1.9f, r * 0.64f),
+                        style = Stroke(width = 2f)
+                    )
+                }
+                rotate(degrees = ringRotation2, pivot = center) {
+                    drawOval(
+                        color = MatrixGreen.copy(alpha = 0.35f),
+                        topLeft = Offset(center.x - r * 0.7f, center.y - r * 0.95f),
+                        size = androidx.compose.ui.geometry.Size(r * 1.4f, r * 1.9f),
+                        style = Stroke(width = 1.5f)
+                    )
+                }
+
+                // Glowing core - the seat of the AI's presence
                 drawCircle(
-                    color = MatrixGreen.copy(alpha = 0.2f),
-                    radius = size.width / 2,
-                    style = Stroke(width = 2f)
+                    brush = Brush.radialGradient(
+                        colors = listOf(Color.White.copy(alpha = coreBreath), MatrixGreen.copy(alpha = coreBreath * 0.7f), Color.Transparent),
+                        center = center,
+                        radius = r * 0.65f
+                    ),
+                    radius = r * 0.6f,
+                    center = center
+                )
+                drawCircle(
+                    color = MatrixGreen,
+                    radius = r * 0.16f * coreBreath,
+                    center = center
                 )
             }
-            Icon(
-                imageVector = Icons.Default.DeveloperMode,
-                contentDescription = "AI Core",
-                tint = MatrixGreen,
-                modifier = Modifier
-                    .size(28.dp)
-                    .graphicsLayer(rotationZ = rotation)
-            )
         }
         Spacer(modifier = Modifier.height(4.dp))
         Text(
@@ -1145,14 +1259,15 @@ fun CommandDeskSlateObject(
     onClick: () -> Unit
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "slate")
-    val bounceY by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = -6f,
+    // The slate's screen flickers gently with readouts, rather than the whole desk bouncing
+    val screenFlicker by infiniteTransition.animateFloat(
+        initialValue = 0.5f,
+        targetValue = 1f,
         animationSpec = infiniteRepeatable(
             animation = tween(1200, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
-        label = "bounce"
+        label = "flicker"
     )
 
     Column(
@@ -1162,34 +1277,64 @@ fun CommandDeskSlateObject(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
-            modifier = Modifier
-                .offset(y = bounceY.dp)
-                .size(width = 90.dp, height = 65.dp)
-                .background(CyberPanel, CutCornerShape(4.dp))
-                .border(2.dp, CyberAmber, CutCornerShape(4.dp))
-                .padding(6.dp),
-            contentAlignment = Alignment.Center
+            modifier = Modifier.size(width = 100.dp, height = 70.dp),
+            contentAlignment = Alignment.BottomCenter
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(
-                    imageVector = Icons.Default.Computer,
-                    contentDescription = "Slate",
-                    tint = CyberAmber,
-                    modifier = Modifier.size(22.dp)
-                )
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(2.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(modifier = Modifier.size(4.dp).background(CyberAmber, RoundedCornerShape(50)))
-                    Text(
-                        text = "SLATE ONLINE",
-                        color = CyberAmber,
-                        fontSize = 8.sp,
-                        fontFamily = FontFamily.Monospace,
-                        fontWeight = FontWeight.Bold
-                    )
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val w = size.width
+                val h = size.height
+
+                // Desk surface in perspective - a real countertop, not a card
+                val desk = Path().apply {
+                    moveTo(w * 0.02f, h * 0.98f)
+                    lineTo(w * 0.98f, h * 0.98f)
+                    lineTo(w * 0.86f, h * 0.72f)
+                    lineTo(w * 0.14f, h * 0.72f)
+                    close()
                 }
+                drawPath(desk, brush = Brush.verticalGradient(listOf(Color(0xFF2B3542), Color(0xFF171F29))))
+                drawPath(desk, color = CyberBorder, style = Stroke(width = 1.5f))
+
+                // Slate propped up at a natural reading angle
+                rotate(degrees = -9f, pivot = Offset(w * 0.42f, h * 0.68f)) {
+                    val slateRect = androidx.compose.ui.geometry.Rect(
+                        left = w * 0.22f, top = h * 0.08f, right = w * 0.66f, bottom = h * 0.7f
+                    )
+                    drawRoundRect(
+                        color = Color(0xFF0C0F14),
+                        topLeft = slateRect.topLeft,
+                        size = slateRect.size,
+                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(6f, 6f)
+                    )
+                    drawRoundRect(
+                        color = CyberAmber.copy(alpha = 0.8f),
+                        topLeft = slateRect.topLeft,
+                        size = slateRect.size,
+                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(6f, 6f),
+                        style = Stroke(width = 2f)
+                    )
+                    // Scrolling readout lines on the slate screen
+                    val lineXs = listOf(0.3f, 0.55f, 0.42f, 0.6f)
+                    for ((i, frac) in lineXs.withIndex()) {
+                        val ly = slateRect.top + slateRect.height * (0.2f + i * 0.18f)
+                        drawLine(
+                            color = CyberAmber.copy(alpha = screenFlicker * (0.4f + i * 0.15f)),
+                            start = Offset(slateRect.left + slateRect.width * 0.14f, ly),
+                            end = Offset(slateRect.left + slateRect.width * frac, ly),
+                            strokeWidth = 3f,
+                            cap = StrokeCap.Round
+                        )
+                    }
+                }
+
+                // Stylus resting beside the slate
+                drawLine(
+                    color = Color(0xFF9AA5B1),
+                    start = Offset(w * 0.74f, h * 0.62f),
+                    end = Offset(w * 0.9f, h * 0.7f),
+                    strokeWidth = 3f,
+                    cap = StrokeCap.Round
+                )
             }
         }
         Spacer(modifier = Modifier.height(4.dp))
@@ -1237,35 +1382,64 @@ fun CoffeeBrewingObject(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
-            modifier = Modifier
-                .size(65.dp)
-                .background(Color.Black.copy(alpha = 0.4f), RoundedCornerShape(6.dp))
-                .border(1.5.dp, CyberMagenta, RoundedCornerShape(6.dp))
-                .padding(4.dp),
-            contentAlignment = Alignment.Center
+            modifier = Modifier.size(width = 74.dp, height = 78.dp),
+            contentAlignment = Alignment.BottomCenter
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                // Animated Steam lines
-                Canvas(modifier = Modifier.size(width = 20.dp, height = 12.dp)) {
-                    val path = Path()
-                    path.moveTo(5f, size.height)
-                    path.quadraticTo(2f, size.height * 0.5f, 5f, 0f)
-                    path.moveTo(10f, size.height)
-                    path.quadraticTo(8f, size.height * 0.5f, 10f, 0f)
-                    path.moveTo(15f, size.height)
-                    path.quadraticTo(12f, size.height * 0.5f, 15f, 0f)
-                    drawPath(
-                        path = path,
-                        color = Color.White.copy(alpha = steamAlpha),
-                        style = Stroke(width = 2f)
-                    )
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val w = size.width
+                val h = size.height
+
+                // Curling steam rising off the brew
+                val steamPath = Path().apply {
+                    moveTo(w * 0.38f, h * 0.42f)
+                    quadraticTo(w * 0.24f, h * 0.28f, w * 0.4f, h * 0.14f)
+                    moveTo(w * 0.5f, h * 0.42f)
+                    quadraticTo(w * 0.36f, h * 0.24f, w * 0.52f, h * 0.02f)
+                    moveTo(w * 0.62f, h * 0.42f)
+                    quadraticTo(w * 0.5f, h * 0.28f, w * 0.64f, h * 0.14f)
                 }
-                Spacer(modifier = Modifier.height(2.dp))
-                Icon(
-                    imageVector = Icons.Default.LocalCafe,
-                    contentDescription = "Coffee Corner",
-                    tint = CyberMagenta,
-                    modifier = Modifier.size(24.dp)
+                drawPath(steamPath, color = Color.White.copy(alpha = steamAlpha), style = Stroke(width = 3f, cap = StrokeCap.Round))
+
+                // Saucer
+                drawOval(
+                    color = Color(0xFF1B1420),
+                    topLeft = Offset(w * 0.06f, h * 0.9f),
+                    size = androidx.compose.ui.geometry.Size(w * 0.88f, h * 0.1f)
+                )
+                drawOval(
+                    color = CyberMagenta.copy(alpha = 0.5f),
+                    topLeft = Offset(w * 0.06f, h * 0.9f),
+                    size = androidx.compose.ui.geometry.Size(w * 0.88f, h * 0.1f),
+                    style = Stroke(width = 1.5f)
+                )
+
+                // Mug body - a real ceramic silhouette, not an icon glyph
+                val mug = Path().apply {
+                    moveTo(w * 0.22f, h * 0.5f)
+                    lineTo(w * 0.18f, h * 0.88f)
+                    quadraticTo(w * 0.5f, h * 0.98f, w * 0.82f, h * 0.88f)
+                    lineTo(w * 0.78f, h * 0.5f)
+                    close()
+                }
+                drawPath(mug, brush = Brush.verticalGradient(listOf(Color(0xFFF5EFE6), Color(0xFFD8CBB8))))
+                drawPath(mug, color = Color(0xFF8A7A63), style = Stroke(width = 1.5f))
+
+                // Coffee surface at the brim
+                drawOval(
+                    color = Color(0xFF3B2313),
+                    topLeft = Offset(w * 0.24f, h * 0.46f),
+                    size = androidx.compose.ui.geometry.Size(w * 0.52f, h * 0.09f)
+                )
+
+                // Handle
+                drawArc(
+                    color = Color(0xFFD8CBB8),
+                    startAngle = -80f,
+                    sweepAngle = 190f,
+                    useCenter = false,
+                    topLeft = Offset(w * 0.72f, h * 0.5f),
+                    size = androidx.compose.ui.geometry.Size(w * 0.34f, h * 0.32f),
+                    style = Stroke(width = 5f, cap = StrokeCap.Round)
                 )
             }
         }
@@ -1297,6 +1471,7 @@ fun StellarCodexObject(
     onClick: () -> Unit
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "codex")
+    // One volume hovers slightly free of the shelf, mid-browse
     val floatY by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = -5f,
@@ -1306,6 +1481,15 @@ fun StellarCodexObject(
         ),
         label = "float"
     )
+    val glowPulse by infiniteTransition.animateFloat(
+        initialValue = 0.4f,
+        targetValue = 0.9f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1800, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "codex_glow"
+    )
 
     Column(
         modifier = modifier
@@ -1314,27 +1498,50 @@ fun StellarCodexObject(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
-            modifier = Modifier
-                .offset(y = floatY.dp)
-                .size(65.dp)
-                .background(Color.Black.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
-                .border(1.5.dp, CyberCyanDim, RoundedCornerShape(8.dp))
-                .padding(6.dp),
-            contentAlignment = Alignment.Center
+            modifier = Modifier.size(width = 84.dp, height = 72.dp),
+            contentAlignment = Alignment.BottomCenter
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(
-                    imageVector = Icons.Default.Book,
-                    contentDescription = "Codex",
-                    tint = CyberCyanDim,
-                    modifier = Modifier.size(26.dp)
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val w = size.width
+                val h = size.height
+                val spineColors = listOf(CyberCyanDim, CyberAmber.copy(alpha = 0.8f), CyberMagenta.copy(alpha = 0.8f), MatrixGreen.copy(alpha = 0.6f))
+                val spineWidths = listOf(0.16f, 0.12f, 0.18f, 0.14f)
+                val spineHeights = listOf(0.62f, 0.78f, 0.7f, 0.5f)
+                var x = w * 0.06f
+
+                for (i in spineColors.indices) {
+                    val sw = w * spineWidths[i]
+                    val sh = h * spineHeights[i]
+                    // The 2nd volume (index 1) floats out, mid-browse
+                    val liftY = if (i == 1) floatY else 0f
+                    drawRoundRect(
+                        color = spineColors[i].copy(alpha = 0.85f),
+                        topLeft = Offset(x, h - sh + liftY),
+                        size = androidx.compose.ui.geometry.Size(sw, sh),
+                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(2f, 2f)
+                    )
+                    // Gilt title band on each spine
+                    drawLine(
+                        color = Color.White.copy(alpha = 0.5f),
+                        start = Offset(x + sw * 0.2f, h - sh + liftY + sh * 0.22f),
+                        end = Offset(x + sw * 0.8f, h - sh + liftY + sh * 0.22f),
+                        strokeWidth = 1.5f
+                    )
+                    x += sw + w * 0.03f
+                }
+
+                // Shelf plank underneath, glowing along the edge
+                drawRoundRect(
+                    color = Color(0xFF1A2230),
+                    topLeft = Offset(0f, h * 0.94f),
+                    size = androidx.compose.ui.geometry.Size(w, h * 0.06f),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(2f, 2f)
                 )
-                Text(
-                    text = "LIB-ACTIVE",
-                    color = CyberCyanDim,
-                    fontSize = 8.sp,
-                    fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight.Bold
+                drawLine(
+                    color = CyberCyanDim.copy(alpha = glowPulse),
+                    start = Offset(w * 0.02f, h * 0.94f),
+                    end = Offset(w * 0.98f, h * 0.94f),
+                    strokeWidth = 1.5f
                 )
             }
         }
@@ -5235,6 +5442,16 @@ fun StarshipElevatorHotspot(
         ),
         label = "pulse"
     )
+    // The seam between the doors breathes with a faint gap-light, as if not perfectly sealed
+    val seamGlow by infiniteTransition.animateFloat(
+        initialValue = 0.15f,
+        targetValue = 0.5f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1800, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "seam_glow"
+    )
 
     Column(
         modifier = modifier
@@ -5243,34 +5460,52 @@ fun StarshipElevatorHotspot(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
-            modifier = Modifier
-                .size(70.dp)
-                .background(Color.Black.copy(alpha = 0.4f), RoundedCornerShape(4.dp))
-                .border(1.5.dp, CyberCyan.copy(alpha = pulse), RoundedCornerShape(4.dp))
-                .padding(6.dp),
+            modifier = Modifier.size(width = 76.dp, height = 88.dp),
             contentAlignment = Alignment.Center
         ) {
             Canvas(modifier = Modifier.fillMaxSize()) {
-                // Vertical lift schematic
+                val w = size.width
+                val h = size.height
+
+                // Door frame
+                drawRoundRect(
+                    color = Color(0xFF232B33),
+                    topLeft = Offset(0f, 0f),
+                    size = androidx.compose.ui.geometry.Size(w, h),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(6f, 6f),
+                    style = Stroke(width = 3f)
+                )
+
+                // Two sliding door panels meeting at a center seam
+                val gap = w * 0.02f
+                drawRoundRect(
+                    brush = Brush.horizontalGradient(listOf(Color(0xFF3A4553), Color(0xFF232B33))),
+                    topLeft = Offset(w * 0.06f, h * 0.06f),
+                    size = androidx.compose.ui.geometry.Size(w * 0.5f - gap, h * 0.88f),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(3f, 3f)
+                )
+                drawRoundRect(
+                    brush = Brush.horizontalGradient(listOf(Color(0xFF232B33), Color(0xFF3A4553))),
+                    topLeft = Offset(w * 0.5f + gap, h * 0.06f),
+                    size = androidx.compose.ui.geometry.Size(w * 0.5f - gap, h * 0.88f),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(3f, 3f)
+                )
+
+                // Glowing center seam
                 drawLine(
-                    color = CyberCyan.copy(alpha = 0.3f),
-                    start = Offset(size.width / 2, 0f),
-                    end = Offset(size.width / 2, size.height),
-                    strokeWidth = 2f
+                    color = CyberCyan.copy(alpha = seamGlow),
+                    start = Offset(w * 0.5f, h * 0.08f),
+                    end = Offset(w * 0.5f, h * 0.92f),
+                    strokeWidth = 2.5f
                 )
-                // Lift cabin dot
-                drawCircle(
-                    color = CyberCyan,
-                    radius = 5f,
-                    center = Offset(size.width / 2, size.height * 0.4f)
-                )
+
+                // Deck indicator light above the doors
+                drawCircle(color = CyberCyan.copy(alpha = pulse), radius = w * 0.045f, center = Offset(w * 0.5f, h * 0.14f))
+
+                // Vertical handle grooves on each panel
+                drawLine(color = Color(0xFF5B6572), start = Offset(w * 0.42f, h * 0.35f), end = Offset(w * 0.42f, h * 0.65f), strokeWidth = 2f)
+                drawLine(color = Color(0xFF5B6572), start = Offset(w * 0.58f, h * 0.35f), end = Offset(w * 0.58f, h * 0.65f), strokeWidth = 2f)
             }
-            Icon(
-                imageVector = Icons.Default.DirectionsTransit,
-                contentDescription = "Transit Lift",
-                tint = CyberCyan,
-                modifier = Modifier.size(24.dp)
-            )
         }
         Spacer(modifier = Modifier.height(4.dp))
         Text(
@@ -5301,6 +5536,17 @@ fun GreenhousePodObject(
     species: String,
     onClick: () -> Unit
 ) {
+    val infiniteTransition = rememberInfiniteTransition(label = "hydropod")
+    val condensationGlow by infiniteTransition.animateFloat(
+        initialValue = 0.25f,
+        targetValue = 0.6f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "condensation"
+    )
+
     Column(
         modifier = Modifier
             .width(130.dp)
@@ -5308,17 +5554,65 @@ fun GreenhousePodObject(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
-            modifier = Modifier
-                .size(width = 110.dp, height = 80.dp)
-                .background(Color.Black.copy(alpha = 0.5f), RoundedCornerShape(8.dp))
-                .border(2.dp, Color(0xFF10B981), RoundedCornerShape(8.dp))
-                .padding(8.dp),
-            contentAlignment = Alignment.Center
+            modifier = Modifier.size(width = 100.dp, height = 100.dp),
+            contentAlignment = Alignment.BottomCenter
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                // Mini plant stem drawing
+            // Glass dome housing, drawn behind the plant
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val w = size.width
+                val h = size.height
+
+                // Base cylinder / hydro basin
+                drawRoundRect(
+                    brush = Brush.verticalGradient(listOf(Color(0xFF1E2A28), Color(0xFF0F1714))),
+                    topLeft = Offset(w * 0.18f, h * 0.82f),
+                    size = androidx.compose.ui.geometry.Size(w * 0.64f, h * 0.16f),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(6f, 6f)
+                )
+                drawLine(
+                    color = Color(0xFF10B981).copy(alpha = condensationGlow),
+                    start = Offset(w * 0.2f, h * 0.85f),
+                    end = Offset(w * 0.8f, h * 0.85f),
+                    strokeWidth = 2f
+                )
+
+                // Glass dome arc over the plant
+                drawArc(
+                    color = Color(0xFF10B981).copy(alpha = 0.28f),
+                    startAngle = 180f,
+                    sweepAngle = 180f,
+                    useCenter = false,
+                    topLeft = Offset(w * 0.08f, h * 0.08f),
+                    size = androidx.compose.ui.geometry.Size(w * 0.84f, h * 0.8f),
+                    style = Stroke(width = 3f)
+                )
+                // Dome specular highlight
+                drawArc(
+                    color = Color.White.copy(alpha = 0.35f),
+                    startAngle = 210f,
+                    sweepAngle = 40f,
+                    useCenter = false,
+                    topLeft = Offset(w * 0.14f, h * 0.14f),
+                    size = androidx.compose.ui.geometry.Size(w * 0.72f, h * 0.68f),
+                    style = Stroke(width = 2f, cap = StrokeCap.Round)
+                )
+                // Condensation droplets on the inside of the glass
+                val rnd = Random(species.hashCode())
+                for (i in 0 until 5) {
+                    val ang = (160f + rnd.nextFloat() * 220f) * (Math.PI / 180f)
+                    val dx = w * 0.5f + kotlin.math.cos(ang).toFloat() * w * 0.4f
+                    val dy = h * 0.45f + kotlin.math.sin(ang).toFloat() * h * 0.36f
+                    drawCircle(color = Color.White.copy(alpha = 0.2f), radius = 1.5f, center = Offset(dx, dy))
+                }
+            }
+
+            // The living plant itself, growing inside the dome
+            Column(
+                modifier = Modifier.padding(bottom = 18.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 PlantVisualStem(progress = growth, species = species)
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = "$growth%",
                     color = Color(0xFF10B981),
@@ -5356,14 +5650,23 @@ fun GreenhouseClimateConsole(
     onClick: () -> Unit
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "climate")
-    val scalePulse by infiniteTransition.animateFloat(
-        initialValue = 1.0f,
-        targetValue = 1.06f,
+    val needleAngle by infiniteTransition.animateFloat(
+        initialValue = -40f,
+        targetValue = 40f,
         animationSpec = infiniteRepeatable(
-            animation = tween(1500, easing = LinearEasing),
+            animation = tween(2200, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
-        label = "pulse"
+        label = "needle"
+    )
+    val ledBlink by infiniteTransition.animateFloat(
+        initialValue = 0.3f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(700, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "led"
     )
 
     Column(
@@ -5373,28 +5676,52 @@ fun GreenhouseClimateConsole(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
-            modifier = Modifier
-                .size(70.dp)
-                .graphicsLayer(scaleX = scalePulse, scaleY = scalePulse)
-                .background(Color.Black.copy(alpha = 0.4f), RoundedCornerShape(6.dp))
-                .border(1.5.dp, Color(0xFF10B981), RoundedCornerShape(6.dp))
-                .padding(6.dp),
+            modifier = Modifier.size(width = 78.dp, height = 66.dp),
             contentAlignment = Alignment.Center
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(
-                    imageVector = Icons.Default.SettingsInputComponent,
-                    contentDescription = "Climate Settings",
-                    tint = Color(0xFF10B981),
-                    modifier = Modifier.size(24.dp)
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val w = size.width
+                val h = size.height
+
+                // Console housing
+                drawRoundRect(
+                    brush = Brush.verticalGradient(listOf(Color(0xFF1B2420), Color(0xFF0D1210))),
+                    size = androidx.compose.ui.geometry.Size(w, h),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(8f, 8f)
                 )
-                Text(
-                    text = "BIOS-LINK",
-                    color = Color(0xFF10B981),
-                    fontSize = 8.sp,
-                    fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight.Bold
+                drawRoundRect(
+                    color = Color(0xFF10B981).copy(alpha = 0.6f),
+                    size = androidx.compose.ui.geometry.Size(w, h),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(8f, 8f),
+                    style = Stroke(width = 1.5f)
                 )
+
+                // Gauge dial with rotating needle
+                val dialCenter = Offset(w * 0.34f, h * 0.42f)
+                val dialR = w * 0.2f
+                drawCircle(color = Color.Black.copy(alpha = 0.5f), radius = dialR, center = dialCenter)
+                drawCircle(color = Color(0xFF10B981), radius = dialR, center = dialCenter, style = Stroke(width = 1.5f))
+                rotate(degrees = needleAngle, pivot = dialCenter) {
+                    drawLine(
+                        color = CyberAmber,
+                        start = dialCenter,
+                        end = Offset(dialCenter.x, dialCenter.y - dialR * 0.85f),
+                        strokeWidth = 2f,
+                        cap = StrokeCap.Round
+                    )
+                }
+
+                // Toggle switches / LED readout row
+                for (i in 0 until 3) {
+                    val lx = w * 0.62f
+                    val ly = h * (0.22f + i * 0.26f)
+                    drawRoundRect(
+                        color = Color(0xFF10B981).copy(alpha = if (i == 0) ledBlink else 0.4f),
+                        topLeft = Offset(lx, ly),
+                        size = androidx.compose.ui.geometry.Size(w * 0.22f, h * 0.12f),
+                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(2f, 2f)
+                    )
+                }
             }
         }
         Spacer(modifier = Modifier.height(4.dp))
@@ -5422,6 +5749,18 @@ fun GreenhouseClimateConsole(
 fun NutrientFeederConsole(
     onClick: () -> Unit
 ) {
+    val infiniteTransition = rememberInfiniteTransition(label = "feeder")
+    // A single nutrient droplet falls from the spout on a loop
+    val dripFall by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1400, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "drip"
+    )
+
     Column(
         modifier = Modifier
             .width(110.dp)
@@ -5429,26 +5768,55 @@ fun NutrientFeederConsole(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
-            modifier = Modifier
-                .size(70.dp)
-                .background(Color.Black.copy(alpha = 0.4f), RoundedCornerShape(50))
-                .border(1.5.dp, CyberCyan, RoundedCornerShape(50))
-                .padding(6.dp),
+            modifier = Modifier.size(width = 60.dp, height = 78.dp),
             contentAlignment = Alignment.Center
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(
-                    imageVector = Icons.Default.Waves,
-                    contentDescription = "Dispenser",
-                    tint = CyberCyan,
-                    modifier = Modifier.size(22.dp)
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val w = size.width
+                val h = size.height
+
+                // Dispenser body - a real cylindrical tank
+                drawRoundRect(
+                    brush = Brush.verticalGradient(listOf(Color(0xFF0E2A33), Color(0xFF07161C))),
+                    topLeft = Offset(w * 0.12f, h * 0.02f),
+                    size = androidx.compose.ui.geometry.Size(w * 0.76f, h * 0.62f),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(10f, 10f)
                 )
-                Text(
-                    text = "FEED-BAY",
-                    color = CyberCyan,
-                    fontSize = 8.sp,
-                    fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight.Bold
+                drawRoundRect(
+                    color = CyberCyan.copy(alpha = 0.6f),
+                    topLeft = Offset(w * 0.12f, h * 0.02f),
+                    size = androidx.compose.ui.geometry.Size(w * 0.76f, h * 0.62f),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(10f, 10f),
+                    style = Stroke(width = 1.5f)
+                )
+                // Liquid fill level line
+                drawLine(
+                    color = CyberCyan.copy(alpha = 0.5f),
+                    start = Offset(w * 0.16f, h * 0.28f),
+                    end = Offset(w * 0.84f, h * 0.28f),
+                    strokeWidth = 1.5f
+                )
+
+                // Spout
+                drawRoundRect(
+                    color = Color(0xFF1B3A44),
+                    topLeft = Offset(w * 0.42f, h * 0.6f),
+                    size = androidx.compose.ui.geometry.Size(w * 0.16f, h * 0.14f)
+                )
+
+                // Falling nutrient droplet loop
+                val dropY = h * 0.74f + (dripFall * h * 0.2f)
+                drawCircle(
+                    color = CyberCyan.copy(alpha = (1f - dripFall) * 0.9f),
+                    radius = w * 0.05f,
+                    center = Offset(w * 0.5f, dropY)
+                )
+
+                // Feed tray at the base
+                drawOval(
+                    color = Color(0xFF1B3A44),
+                    topLeft = Offset(w * 0.1f, h * 0.9f),
+                    size = androidx.compose.ui.geometry.Size(w * 0.8f, h * 0.08f)
                 )
             }
         }
@@ -5495,32 +5863,58 @@ fun LoungeJukeboxObject(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
-            modifier = Modifier
-                .size(70.dp)
-                .background(Color.Black.copy(alpha = 0.4f), RoundedCornerShape(8.dp))
-                .border(1.5.dp, CyberMagenta, RoundedCornerShape(8.dp))
-                .padding(6.dp),
+            modifier = Modifier.size(width = 66.dp, height = 80.dp),
             contentAlignment = Alignment.Center
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(2.dp),
-                    verticalAlignment = Alignment.Bottom,
-                    modifier = Modifier.height(20.dp)
-                ) {
-                    Box(modifier = Modifier.width(3.dp).fillMaxHeight(waveHeight * 0.4f).background(CyberMagenta))
-                    Box(modifier = Modifier.width(3.dp).fillMaxHeight(waveHeight * 1.0f).background(CyberMagenta))
-                    Box(modifier = Modifier.width(3.dp).fillMaxHeight(waveHeight * 0.7f).background(CyberMagenta))
-                    Box(modifier = Modifier.width(3.dp).fillMaxHeight(waveHeight * 0.5f).background(CyberMagenta))
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val w = size.width
+                val h = size.height
+
+                // Retro cabinet body with an arched top, standing on the deck
+                val cabinet = Path().apply {
+                    moveTo(w * 0.06f, h)
+                    lineTo(w * 0.06f, h * 0.42f)
+                    arcTo(
+                        rect = androidx.compose.ui.geometry.Rect(
+                            left = w * 0.06f, top = h * 0.02f, right = w * 0.94f, bottom = h * 0.82f
+                        ),
+                        startAngleDegrees = 180f,
+                        sweepAngleDegrees = 180f,
+                        forceMoveTo = false
+                    )
+                    lineTo(w * 0.94f, h)
+                    close()
                 }
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = "JUKEBOX",
-                    color = CyberMagenta,
-                    fontSize = 8.sp,
-                    fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight.Bold
-                )
+                drawPath(cabinet, brush = Brush.verticalGradient(listOf(Color(0xFF241420), Color(0xFF120A10))))
+                drawPath(cabinet, color = CyberMagenta.copy(alpha = 0.7f), style = Stroke(width = 2f))
+
+                // Glowing tubes behind an inset window, pulsing to the beat
+                val bars = listOf(0.4f, 1.0f, 0.7f, 0.5f, 0.85f)
+                val barAreaTop = h * 0.16f
+                val barAreaBottom = h * 0.62f
+                val barW = w * 0.09f
+                var bx = w * 0.16f
+                for (frac in bars) {
+                    val barH = (barAreaBottom - barAreaTop) * frac * waveHeight.coerceIn(0.25f, 1f)
+                    drawRoundRect(
+                        color = CyberMagenta.copy(alpha = 0.85f),
+                        topLeft = Offset(bx, barAreaBottom - barH),
+                        size = androidx.compose.ui.geometry.Size(barW, barH),
+                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(2f, 2f)
+                    )
+                    bx += barW + w * 0.03f
+                }
+
+                // Speaker grille dots along the base
+                for (i in 0 until 3) {
+                    for (j in 0 until 3) {
+                        drawCircle(
+                            color = Color(0xFF5B3B4C),
+                            radius = w * 0.02f,
+                            center = Offset(w * (0.32f + j * 0.18f), h * (0.7f + i * 0.09f))
+                        )
+                    }
+                }
             }
         }
         Spacer(modifier = Modifier.height(4.dp))
@@ -5552,6 +5946,17 @@ fun CompanionHabitationRoomObject(
     activeQuest: String,
     onClick: () -> Unit
 ) {
+    val infiniteTransition = rememberInfiniteTransition(label = "hab_door")
+    val windowGlow by infiniteTransition.animateFloat(
+        initialValue = 0.4f,
+        targetValue = 0.85f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1900, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "hab_glow"
+    )
+
     Column(
         modifier = Modifier
             .width(130.dp)
@@ -5559,29 +5964,63 @@ fun CompanionHabitationRoomObject(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
-            modifier = Modifier
-                .size(width = 110.dp, height = 80.dp)
-                .background(Color.Black.copy(alpha = 0.4f), RoundedCornerShape(8.dp))
-                .border(2.dp, color, RoundedCornerShape(8.dp))
-                .padding(6.dp),
+            modifier = Modifier.size(width = 82.dp, height = 96.dp),
             contentAlignment = Alignment.Center
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(
-                    imageVector = Icons.Default.AccountCircle,
-                    contentDescription = "Companion Profile",
-                    tint = color,
-                    modifier = Modifier.size(28.dp)
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val w = size.width
+                val h = size.height
+
+                // A real cabin door, not a badge
+                drawRoundRect(
+                    brush = Brush.verticalGradient(listOf(Color(0xFF262E38), Color(0xFF12171E))),
+                    size = androidx.compose.ui.geometry.Size(w, h),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(10f, 10f)
                 )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = name,
-                    color = Color.White,
-                    fontSize = 10.sp,
-                    fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight.Bold
+                drawRoundRect(
+                    color = color,
+                    size = androidx.compose.ui.geometry.Size(w, h),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(10f, 10f),
+                    style = Stroke(width = 2f)
+                )
+                // Recessed panel line
+                drawRoundRect(
+                    color = color.copy(alpha = 0.3f),
+                    topLeft = Offset(w * 0.1f, h * 0.08f),
+                    size = androidx.compose.ui.geometry.Size(w * 0.8f, h * 0.84f),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(8f, 8f),
+                    style = Stroke(width = 1f)
+                )
+
+                // Circular porthole window with the crew member's initial glowing inside
+                val winCenter = Offset(w * 0.5f, h * 0.36f)
+                val winR = w * 0.24f
+                drawCircle(color = Color(0xFF060A10), radius = winR, center = winCenter)
+                drawCircle(color = color.copy(alpha = windowGlow), radius = winR, center = winCenter, style = Stroke(width = 2.5f))
+
+                // Nameplate plaque near the base of the door
+                drawRoundRect(
+                    color = Color.Black.copy(alpha = 0.5f),
+                    topLeft = Offset(w * 0.2f, h * 0.72f),
+                    size = androidx.compose.ui.geometry.Size(w * 0.6f, h * 0.14f),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(3f, 3f)
+                )
+                drawRoundRect(
+                    color = color.copy(alpha = 0.7f),
+                    topLeft = Offset(w * 0.2f, h * 0.72f),
+                    size = androidx.compose.ui.geometry.Size(w * 0.6f, h * 0.14f),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(3f, 3f),
+                    style = Stroke(width = 1f)
                 )
             }
+            Text(
+                text = name.take(1),
+                color = color,
+                fontSize = 20.sp,
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 32.dp)
+            )
         }
         Spacer(modifier = Modifier.height(4.dp))
         Text(
@@ -5628,30 +6067,58 @@ fun PetIncubatorSanctuaryObject(
             .clickable(onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        val creatureBreath by rememberInfiniteTransition(label = "creature").animateFloat(
+            initialValue = 0.85f,
+            targetValue = 1.05f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(1400, easing = FastOutSlowInEasing),
+                repeatMode = RepeatMode.Reverse
+            ),
+            label = "breath"
+        )
+
         Box(
-            modifier = Modifier
-                .size(75.dp)
-                .background(Color.Black.copy(alpha = 0.4f), RoundedCornerShape(50))
-                .border(1.5.dp, Color(0xFFC084FC), RoundedCornerShape(50))
-                .padding(4.dp),
+            modifier = Modifier.size(84.dp),
             contentAlignment = Alignment.Center
         ) {
             Canvas(modifier = Modifier.fillMaxSize()) {
-                // Draw a small revolving orbit
+                val center = Offset(size.width / 2f, size.height / 2f)
+                val podR = size.minDimension / 2f
+
+                // Egg-shaped incubator pod, glass over a warm bio-glow
+                drawOval(
+                    brush = Brush.radialGradient(
+                        colors = listOf(Color(0xFF2A1440), Color(0xFF0D0616)),
+                        center = center,
+                        radius = podR * 0.95f
+                    ),
+                    topLeft = Offset(center.x - podR * 0.72f, center.y - podR * 0.95f),
+                    size = androidx.compose.ui.geometry.Size(podR * 1.44f, podR * 1.9f)
+                )
+                drawOval(
+                    color = Color(0xFFC084FC).copy(alpha = 0.7f),
+                    topLeft = Offset(center.x - podR * 0.72f, center.y - podR * 0.95f),
+                    size = androidx.compose.ui.geometry.Size(podR * 1.44f, podR * 1.9f),
+                    style = Stroke(width = 2f)
+                )
+
+                // Orbiting containment ring, tilted like a gyroscope band
+                rotate(degrees = orbitRotation, pivot = center) {
+                    drawOval(
+                        color = Color(0xFFC084FC).copy(alpha = 0.35f),
+                        topLeft = Offset(center.x - podR * 0.9f, center.y - podR * 0.28f),
+                        size = androidx.compose.ui.geometry.Size(podR * 1.8f, podR * 0.56f),
+                        style = Stroke(width = 1.5f)
+                    )
+                }
+
+                // Soft creature silhouette curled inside, gently breathing
                 drawCircle(
-                    color = Color(0xFFC084FC).copy(alpha = 0.2f),
-                    radius = size.width / 2.3f,
-                    style = Stroke(width = 1f)
+                    color = Color(0xFFC084FC).copy(alpha = 0.85f),
+                    radius = podR * 0.32f * creatureBreath,
+                    center = Offset(center.x, center.y + podR * 0.1f)
                 )
             }
-            Icon(
-                imageVector = Icons.Default.Pets,
-                contentDescription = "Pet Playpen",
-                tint = Color(0xFFC084FC),
-                modifier = Modifier
-                    .size(24.dp)
-                    .graphicsLayer(rotationZ = orbitRotation)
-            )
         }
         Spacer(modifier = Modifier.height(4.dp))
         Text(
