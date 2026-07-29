@@ -679,40 +679,76 @@ fun CabinView(state: GameUiState, viewModel: GameViewModel) {
                         )
                     }
                     StarshipDeck.BIOMECHANICAL_GREENHOUSE -> {
+                        // Spread across the full panorama like Crew Habitation / Aquarium
+                        // Lounge got - a bay you walk down, not one row stranded mid-screen
+                        val bayFractions = listOf(0.08f, 0.28f, 0.52f, 0.88f)
+
                         BiomechanicalGreenhouseBackground()
+                        GreenhouseStructure(alcoveXFractions = bayFractions)
                         GreenhouseBioluminescentParticles()
 
-                        Row(
+                        GreenhousePodObject(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 110.dp),
-                            horizontalArrangement = Arrangement.SpaceEvenly,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            GreenhousePodObject(
-                                title = "HYDRO-POD ALPHA",
-                                plantName = state.plants.getOrNull(0)?.name ?: "Empty Plot",
-                                growth = state.plants.getOrNull(0)?.growthProgress ?: 0,
-                                species = state.plants.getOrNull(0)?.species ?: "Stellar Lily",
-                                onClick = { if (zoomedNode == null) zoomedNode = CabinetNode.GREENHOUSE }
-                            )
+                                .align(Alignment.TopStart)
+                                .offset(x = 1380.dp * bayFractions[0], y = 150.dp),
+                            title = "HYDRO-POD ALPHA",
+                            plantName = state.plants.getOrNull(0)?.name ?: "Empty Plot",
+                            growth = state.plants.getOrNull(0)?.growthProgress ?: 0,
+                            species = state.plants.getOrNull(0)?.species ?: "Stellar Lily",
+                            onClick = {
+                                if (zoomedNode == null) {
+                                    zoomPivotOverride = bayFractions[0] to 0.45f
+                                    zoomedNode = CabinetNode.GREENHOUSE
+                                }
+                            }
+                        )
 
-                            GreenhousePodObject(
-                                title = "HYDRO-POD BETA",
-                                plantName = state.plants.getOrNull(1)?.name ?: "Empty Plot",
-                                growth = state.plants.getOrNull(1)?.growthProgress ?: 0,
-                                species = state.plants.getOrNull(1)?.species ?: "Chronos Fern",
-                                onClick = { if (zoomedNode == null) zoomedNode = CabinetNode.GREENHOUSE }
-                            )
+                        GreenhouseFoliageProp(
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .offset(x = 1380.dp * bayFractions[0] + 150.dp, y = 200.dp)
+                        )
 
-                            GreenhouseClimateConsole(
-                                onClick = { if (zoomedNode == null) zoomedNode = CabinetNode.GREENHOUSE }
-                            )
+                        GreenhousePodObject(
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .offset(x = 1380.dp * bayFractions[1], y = 150.dp),
+                            title = "HYDRO-POD BETA",
+                            plantName = state.plants.getOrNull(1)?.name ?: "Empty Plot",
+                            growth = state.plants.getOrNull(1)?.growthProgress ?: 0,
+                            species = state.plants.getOrNull(1)?.species ?: "Chronos Fern",
+                            onClick = {
+                                if (zoomedNode == null) {
+                                    zoomPivotOverride = bayFractions[1] to 0.45f
+                                    zoomedNode = CabinetNode.GREENHOUSE
+                                }
+                            }
+                        )
 
-                            StarshipElevatorHotspot(
-                                onClick = { if (zoomedNode == null) zoomedNode = CabinetNode.ELEVATOR }
-                            )
-                        }
+                        GreenhouseClimateConsole(
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .offset(x = 1380.dp * bayFractions[2], y = 170.dp),
+                            onClick = {
+                                if (zoomedNode == null) {
+                                    zoomPivotOverride = bayFractions[2] to 0.45f
+                                    zoomedNode = CabinetNode.GREENHOUSE
+                                }
+                            }
+                        )
+
+                        GreenhouseFoliageProp(
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .offset(x = 1380.dp * bayFractions[2] + 160.dp, y = 190.dp)
+                        )
+
+                        StarshipElevatorHotspot(
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .offset(x = 1380.dp * bayFractions[3], y = 120.dp),
+                            onClick = { if (zoomedNode == null) zoomedNode = CabinetNode.ELEVATOR }
+                        )
                     }
                     StarshipDeck.AQUARIUM_LOUNGE -> {
                         // The lounge now spans the full panorama - a viewing bay you approach,
@@ -5532,6 +5568,7 @@ fun StarshipElevatorHotspot(
 
 @Composable
 fun GreenhousePodObject(
+    modifier: Modifier = Modifier,
     title: String,
     plantName: String,
     growth: Int,
@@ -5550,7 +5587,7 @@ fun GreenhousePodObject(
     )
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .width(130.dp)
             .clickable(onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -5649,6 +5686,7 @@ fun GreenhousePodObject(
 
 @Composable
 fun GreenhouseClimateConsole(
+    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "climate")
@@ -5672,7 +5710,7 @@ fun GreenhouseClimateConsole(
     )
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .width(110.dp)
             .clickable(onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -6216,6 +6254,106 @@ fun GreenhouseBioluminescentParticles() {
                 radius = 12f + (i % 3) * 4f,
                 center = Offset(cx, cy)
             )
+        }
+    }
+}
+
+// Floor perspective + recessed growing-bay niches, so the greenhouse reads as
+// a bay the captain walks down rather than one row of props floating in the middle
+@Composable
+fun GreenhouseStructure(alcoveXFractions: List<Float>) {
+    Canvas(modifier = Modifier.fillMaxSize()) {
+        val w = size.width
+        val h = size.height
+        val floorY = h * 0.92f
+        val vanishX = w * 0.5f
+        val vanishY = h * 0.5f
+
+        // Floor perspective lines converging toward a vanishing point down the bay
+        for (i in 0..8) {
+            val fx = w * (i / 8f)
+            drawLine(
+                color = Color(0xFF10B981).copy(alpha = 0.1f),
+                start = Offset(fx, floorY),
+                end = Offset(vanishX, vanishY),
+                strokeWidth = 1.5f
+            )
+        }
+        drawLine(
+            color = Color(0xFF10B981).copy(alpha = 0.18f),
+            start = Offset(0f, floorY),
+            end = Offset(w, floorY),
+            strokeWidth = 2f
+        )
+
+        // Overhead grow-light strip running the length of the bay
+        drawLine(
+            color = Color(0xFF10B981).copy(alpha = 0.3f),
+            start = Offset(0f, h * 0.08f),
+            end = Offset(w, h * 0.08f),
+            strokeWidth = 3f
+        )
+
+        // Recessed growing-bay niche behind each pod / console / lift
+        for (fx in alcoveXFractions) {
+            val cx = w * fx
+            drawRoundRect(
+                color = Color(0xFF012A18).copy(alpha = 0.55f),
+                topLeft = Offset(cx - w * 0.07f, h * 0.16f),
+                size = androidx.compose.ui.geometry.Size(w * 0.14f, h * 0.62f),
+                cornerRadius = androidx.compose.ui.geometry.CornerRadius(10f, 10f)
+            )
+            drawLine(
+                color = Color(0xFF10B981).copy(alpha = 0.14f),
+                start = Offset(cx, h * 0.16f),
+                end = Offset(cx, floorY),
+                strokeWidth = 1f
+            )
+        }
+    }
+}
+
+// Decorative trailing vine planter, purely ambient - fills the bay between
+// interactive pods so the walk between them doesn't feel like empty corridor
+@Composable
+fun GreenhouseFoliageProp(modifier: Modifier = Modifier) {
+    val infiniteTransition = rememberInfiniteTransition(label = "foliage_sway")
+    val sway by infiniteTransition.animateFloat(
+        initialValue = -4f,
+        targetValue = 4f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2600, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "sway"
+    )
+
+    Canvas(modifier = modifier.size(width = 64.dp, height = 96.dp)) {
+        val w = size.width
+        val h = size.height
+
+        // Wall-mounted planter box
+        drawRoundRect(
+            brush = Brush.verticalGradient(listOf(Color(0xFF1E2A28), Color(0xFF0F1714))),
+            topLeft = Offset(w * 0.15f, h * 0.78f),
+            size = androidx.compose.ui.geometry.Size(w * 0.7f, h * 0.16f),
+            cornerRadius = androidx.compose.ui.geometry.CornerRadius(4f, 4f)
+        )
+
+        // Trailing vines swaying gently
+        for (i in 0 until 3) {
+            val baseX = w * (0.3f + i * 0.2f)
+            val tipX = baseX + sway * (1f + i * 0.3f)
+            val path = androidx.compose.ui.graphics.Path().apply {
+                moveTo(baseX, h * 0.78f)
+                quadraticTo(baseX - 6f, h * 0.45f, tipX, h * 0.08f + i * 6f)
+            }
+            drawPath(
+                path = path,
+                color = Color(0xFF10B981).copy(alpha = 0.55f),
+                style = Stroke(width = 2.5f, cap = StrokeCap.Round)
+            )
+            drawCircle(color = Color(0xFF34D399).copy(alpha = 0.7f), radius = 3f, center = Offset(tipX, h * 0.08f + i * 6f))
         }
     }
 }

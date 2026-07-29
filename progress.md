@@ -4,7 +4,7 @@ Living document for tracking the ship-immersion redesign initiative. See
 `Quantum Effect Captain's Quarters Build Bible.txt` for the full design vision;
 this file tracks *implementation* status against it.
 
-Last updated: 2026-07-29
+Last updated: 2026-07-29 (session 2)
 
 ## Current initiative: "Dynamic wallpaper" starship
 
@@ -34,19 +34,12 @@ with real spatial compositions (corridors, lounges) that reward swiping.
 | 2 | [#2](https://github.com/KMS-UX/QECaptainsQuarter/pull/2) | **Crew Habitation deck**: was showing 2 hardcoded fake doors ("JAX", "LYRA") with invented roles/colors that didn't match the real roster. Now generates one door per real companion (`state.companions`: Lyra, Nova, Elara, Quark) from `GameViewModel`, laid out down a proper corridor (`CrewCorridorStructure`: floor perspective lines, recessed door alcoves) instead of a centered `Row`. Tapping a door routes straight into *that* companion's detail screen via `viewModel.selectCompanionChat(id)` instead of a generic tabbed menu. Added `zoomPivotOverride` so the zoom-in animation targets the specific door tapped (previously all crew-node hotspots shared one fixed pivot). |
 | 3 | [#3](https://github.com/KMS-UX/QECaptainsQuarter/pull/3) | **Aquarium Lounge deck**: was one compact centered block (tank + feeder + jukebox) in the middle of the 1380dp panorama — swiping just revealed empty background either side. Spread it across the full width: tank is now a bigger (640dp) centerpiece in a recessed viewing-bay frame (`AquariumLoungeStructure`), added decorative bench seating (`LoungeSeatingProp`) for a "watch the fish" lounge feel, feeder/jukebox got their own alcove recesses further down the room. |
 
-All three merged to `main` via squash-merge PRs; each confirmed green on the
-`Build Android APK` GitHub Actions workflow after merge.
+| 4 | (unmerged, this branch) | **Greenhouse / Plantation deck**: replaced the centered `Row(SpaceEvenly)` layout with the same corridor/lounge recipe as PRs #2/#3. Added `GreenhouseStructure` (floor perspective + recessed growing-bay niches behind each prop) and `GreenhouseFoliageProp` (decorative swaying wall-planter, purely ambient) to `GameScreens.kt`. `GreenhousePodObject`/`GreenhouseClimateConsole` got a `modifier: Modifier = Modifier` first param (existing recipe step 3) so they can be placed with absolute offsets. Hydro-Pod Alpha/Beta, the Climate Console, and the elevator are now spread across x-fractions `[0.08, 0.28, 0.52, 0.88]` of the 1380dp panorama, with two foliage props filling the gaps. Also added a per-hotspot `zoomPivotOverride` for the pods/console (same fix PR #2 applied to Crew doors) since they no longer share one on-screen position, so the old single fixed `CabinetNode.GREENHOUSE` pivot would have zoomed toward the wrong spot depending which prop was tapped. |
+
+All three merged PRs confirmed green on the `Build Android APK` GitHub Actions
+workflow after merge. PR #4 (this session) not yet opened/merged — see below.
 
 ### Not started yet
-
-- **Greenhouse / Plantation deck** — still uses the pre-initiative centered
-  `Row` layout (`StarshipDeck.BIOMECHANICAL_GREENHOUSE` in `CabinView`). Objects
-  (`GreenhousePodObject`, `GreenhouseClimateConsole`) already got the physical-prop
-  visual treatment in PR #1, but the deck composition itself needs the same
-  corridor/lounge spatial treatment as Crew Habitation and Aquarium Lounge got.
-  Natural next step, same recipe: add a `GreenhouseStructure`-style background
-  composable, spread pods/console/elevator across absolute offsets instead of
-  `Row.SpaceEvenly`.
 - **Individual companion rooms (visual, not just routing)** — PR #2 made each
   crew door route to the *correct* companion, but all companions still land on
   the same `CompanionDetailScreen` UI. The Build Bible / user's stated goal is
@@ -110,7 +103,12 @@ All three merged to `main` via squash-merge PRs; each confirmed green on the
 
 ## Suggested next session
 
-Pick up with the **Greenhouse/Plantation deck** spatial redesign (same recipe
-as above — lowest-risk, most mechanical of the remaining items), then decide
-whether to do the **individual companion room decor** pass next or return to
-it later once all decks have their shell.
+Greenhouse deck now has its spatial pass (see PR #4 row above), so all 4 decks
+have the corridor/lounge/bay treatment. Next up per the "Not started yet" list:
+either the **individual companion room decor** pass (bigger, more creative —
+needs per-companion themed visuals), or push further into the **detail panel**
+polish (Captain's Desk / AI Terminal / Bookshelf / Coffee Corner) now that the
+room layer is consistent across all decks. No local Android SDK in this
+sandbox either — same verification method as prior sessions: careful manual
+review of Compose API usage (brace/paren balance checked with a script) plus
+watching the `Build Android APK` GitHub Actions workflow after push/merge.
