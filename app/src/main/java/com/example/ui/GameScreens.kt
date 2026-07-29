@@ -715,67 +715,57 @@ fun CabinView(state: GameUiState, viewModel: GameViewModel) {
                         }
                     }
                     StarshipDeck.AQUARIUM_LOUNGE -> {
+                        // The lounge now spans the full panorama - a viewing bay you approach,
+                        // with seating and a feeder/jukebox corner further down, not one
+                        // widget stranded in the middle of an empty room
                         AquariumLoungeBackground()
+                        AquariumLoungeStructure(
+                            bayXFraction = 0.26f,
+                            bayWidthFraction = 0.46f,
+                            alcoveXFractions = listOf(0.57f, 0.73f)
+                        )
                         AquariumLoungeParticles()
 
-                        Box(
+                        AquariumViewingBayObject(
                             modifier = Modifier
-                                .fillMaxSize()
-                                .padding(top = 60.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(16.dp)
-                            ) {
-                                Text(
-                                    text = "COMMUNAL AQUA-TANK SYSTEM",
-                                    color = CyberCyan,
-                                    fontSize = 11.sp,
-                                    fontFamily = FontFamily.Monospace,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier
-                                        .background(Color.Black.copy(alpha = 0.7f), RoundedCornerShape(4.dp))
-                                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                                )
+                                .align(Alignment.TopStart)
+                                .offset(x = 40.dp, y = 70.dp),
+                            fishList = state.fish,
+                            onClick = { if (zoomedNode == null) zoomedNode = CabinetNode.AQUARIUM }
+                        )
 
-                                Box(
-                                    modifier = Modifier
-                                        .size(width = 520.dp, height = 130.dp)
-                                        .border(2.dp, CyberCyan, RoundedCornerShape(12.dp))
-                                        .clip(RoundedCornerShape(12.dp))
-                                        .clickable { if (zoomedNode == null) zoomedNode = CabinetNode.AQUARIUM }
-                                ) {
-                                    AquariumSimulationTank(fishList = state.fish)
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .background(
-                                                Brush.radialGradient(
-                                                    colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.5f))
-                                                )
-                                            )
-                                    )
-                                }
+                        LoungeSeatingProp(
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .offset(x = 140.dp, y = 280.dp)
+                        )
 
-                                Row(
-                                    horizontalArrangement = Arrangement.spacedBy(40.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    NutrientFeederConsole(
-                                        onClick = { if (zoomedNode == null) zoomedNode = CabinetNode.AQUARIUM }
-                                    )
+                        NutrientFeederConsole(
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .offset(x = 760.dp, y = 190.dp),
+                            onClick = { if (zoomedNode == null) zoomedNode = CabinetNode.AQUARIUM }
+                        )
 
-                                    LoungeJukeboxObject(
-                                        onClick = { if (zoomedNode == null) zoomedNode = CabinetNode.AQUARIUM }
-                                    )
+                        LoungeSeatingProp(
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .offset(x = 870.dp, y = 300.dp)
+                        )
 
-                                    StarshipElevatorHotspot(
-                                        onClick = { if (zoomedNode == null) zoomedNode = CabinetNode.ELEVATOR }
-                                    )
-                                }
-                            }
-                        }
+                        LoungeJukeboxObject(
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .offset(x = 990.dp, y = 180.dp),
+                            onClick = { if (zoomedNode == null) zoomedNode = CabinetNode.AQUARIUM }
+                        )
+
+                        StarshipElevatorHotspot(
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .offset(x = 1220.dp, y = 130.dp),
+                            onClick = { if (zoomedNode == null) zoomedNode = CabinetNode.ELEVATOR }
+                        )
                     }
                     StarshipDeck.CREW_HABITATION -> {
                         // Real companions from the roster, each with their own door down the hall -
@@ -5759,6 +5749,7 @@ fun GreenhouseClimateConsole(
 
 @Composable
 fun NutrientFeederConsole(
+    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "feeder")
@@ -5774,7 +5765,7 @@ fun NutrientFeederConsole(
     )
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .width(110.dp)
             .clickable(onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -5855,6 +5846,7 @@ fun NutrientFeederConsole(
 
 @Composable
 fun LoungeJukeboxObject(
+    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "jukebox")
@@ -5869,7 +5861,7 @@ fun LoungeJukeboxObject(
     )
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .width(110.dp)
             .clickable(onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -6279,6 +6271,133 @@ fun AquariumLoungeParticles() {
                 radius = 3f + (i % 2) * 2f,
                 center = Offset(xPos, yPos),
                 style = Stroke(width = 1f)
+            )
+        }
+    }
+}
+
+// A lounge floor with a recessed viewing-bay frame and smaller alcoves, so the
+// aquarium reads as a room people gather in rather than a backdrop for a widget
+@Composable
+fun AquariumLoungeStructure(bayXFraction: Float, bayWidthFraction: Float, alcoveXFractions: List<Float>) {
+    Canvas(modifier = Modifier.fillMaxSize()) {
+        val w = size.width
+        val h = size.height
+        val floorY = h * 0.9f
+        val vanishX = w * 0.5f
+        val vanishY = h * 0.5f
+
+        // Floor perspective lines converging toward the center of the lounge
+        for (i in 0..8) {
+            val fx = w * (i / 8f)
+            drawLine(
+                color = CyberCyan.copy(alpha = 0.08f),
+                start = Offset(fx, floorY),
+                end = Offset(vanishX, vanishY),
+                strokeWidth = 1.5f
+            )
+        }
+        drawLine(color = CyberCyan.copy(alpha = 0.16f), start = Offset(0f, floorY), end = Offset(w, floorY), strokeWidth = 2f)
+
+        // Ceiling light strip
+        drawLine(color = CyberCyan.copy(alpha = 0.26f), start = Offset(0f, h * 0.07f), end = Offset(w, h * 0.07f), strokeWidth = 3f)
+
+        // Recessed viewing-bay frame set into the wall behind the big tank
+        val bayCx = w * bayXFraction
+        val bayHalf = w * bayWidthFraction / 2f
+        drawRoundRect(
+            color = Color(0xFF012A24).copy(alpha = 0.6f),
+            topLeft = Offset(bayCx - bayHalf, h * 0.12f),
+            size = androidx.compose.ui.geometry.Size(bayHalf * 2f, h * 0.58f),
+            cornerRadius = androidx.compose.ui.geometry.CornerRadius(16f, 16f)
+        )
+        drawRoundRect(
+            color = Color(0xFF10B981).copy(alpha = 0.35f),
+            topLeft = Offset(bayCx - bayHalf, h * 0.12f),
+            size = androidx.compose.ui.geometry.Size(bayHalf * 2f, h * 0.58f),
+            cornerRadius = androidx.compose.ui.geometry.CornerRadius(16f, 16f),
+            style = Stroke(width = 2f)
+        )
+
+        // Smaller alcove recesses behind the feeder / jukebox
+        for (fx in alcoveXFractions) {
+            val cx = w * fx
+            drawRoundRect(
+                color = Color.Black.copy(alpha = 0.22f),
+                topLeft = Offset(cx - w * 0.05f, h * 0.2f),
+                size = androidx.compose.ui.geometry.Size(w * 0.1f, h * 0.5f),
+                cornerRadius = androidx.compose.ui.geometry.CornerRadius(8f, 8f)
+            )
+        }
+    }
+}
+
+// A simple built-in bench, purely decorative - the kind of thing that makes a
+// lounge feel like somewhere the crew actually gathers to watch the fish
+@Composable
+fun LoungeSeatingProp(modifier: Modifier = Modifier) {
+    Canvas(modifier = modifier.size(width = 90.dp, height = 46.dp)) {
+        val w = size.width
+        val h = size.height
+        drawRoundRect(
+            brush = Brush.verticalGradient(listOf(Color(0xFF0E3A38), Color(0xFF082220))),
+            topLeft = Offset(0f, h * 0.35f),
+            size = androidx.compose.ui.geometry.Size(w, h * 0.45f),
+            cornerRadius = androidx.compose.ui.geometry.CornerRadius(6f, 6f)
+        )
+        drawRoundRect(
+            color = Color(0xFF10B981).copy(alpha = 0.4f),
+            topLeft = Offset(0f, h * 0.35f),
+            size = androidx.compose.ui.geometry.Size(w, h * 0.45f),
+            cornerRadius = androidx.compose.ui.geometry.CornerRadius(6f, 6f),
+            style = Stroke(width = 1.5f)
+        )
+        // Legs
+        drawLine(color = Color(0xFF08201E), start = Offset(w * 0.1f, h * 0.8f), end = Offset(w * 0.1f, h), strokeWidth = 3f)
+        drawLine(color = Color(0xFF08201E), start = Offset(w * 0.9f, h * 0.8f), end = Offset(w * 0.9f, h), strokeWidth = 3f)
+    }
+}
+
+// The tank set behind glass in its own viewing-bay frame, with a title plate -
+// the deck's centerpiece rather than a floating widget in empty space
+@Composable
+fun AquariumViewingBayObject(
+    modifier: Modifier = Modifier,
+    fishList: List<FishState>,
+    onClick: () -> Unit
+) {
+    Column(
+        modifier = modifier.clickable(onClick = onClick),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Text(
+            text = "COMMUNAL AQUA-TANK SYSTEM",
+            color = CyberCyan,
+            fontSize = 11.sp,
+            fontFamily = FontFamily.Monospace,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .background(Color.Black.copy(alpha = 0.7f), RoundedCornerShape(4.dp))
+                .padding(horizontal = 8.dp, vertical = 4.dp)
+        )
+
+        Box(
+            modifier = Modifier
+                .width(640.dp)
+                .height(170.dp)
+                .border(2.dp, CyberCyan, RoundedCornerShape(12.dp))
+                .clip(RoundedCornerShape(12.dp))
+        ) {
+            AquariumSimulationTank(fishList = fishList)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.radialGradient(
+                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.5f))
+                        )
+                    )
             )
         }
     }
