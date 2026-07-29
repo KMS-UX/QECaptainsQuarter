@@ -1,0 +1,6 @@
+{
+  "name": "Captain's Quarters",
+  "description": "A cozy daily life simulation game aboard a starship in the Quantum Effect universe.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
