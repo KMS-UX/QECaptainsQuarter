@@ -1,0 +1,373 @@
+Quantum Effect: Captain's Quarters
+Build Bible v1.0
+Vision Statement
+
+Quantum Effect: Captain's Quarters is a cozy sci-fi life simulation where the player lives aboard their own starship as its captain.
+Rather than focusing on combat or grinding, the game encourages players to build a daily relationship with their ship, crew, AI companion, and the living galaxy.
+The game evolves alongside the player's real life through time, weather, personal reflections, and dynamic events, creating the feeling that the ship continues its journey even when the player is away.
+
+Design Pillars
+1. A Place You Want To Return To
+
+The ship should feel like home.
+Not a menu. Not a level. A home.
+
+2. Small Daily Rituals
+
+Every login should feel relaxing.
+
+Examples:
+
+Morning report
+Look out the window
+Feed ship pets
+Talk to crew
+Record captain's log
+Read messages
+Water plants
+Drink coffee
+
+3. Living Galaxy
+
+The universe never stops moving.
+
+Even while offline:
+
+Trade routes change
+Nebulae drift
+Crew finish tasks
+Plants grow
+Research progresses
+Friends send messages
+New discoveries appear
+
+4. Personal Story
+
+No two captains experience exactly the same journey.
+
+The captain's personality is reflected through:
+
+journal entries
+choices
+friendships
+decorations
+discoveries
+crew culture
+
+5. Calm Before Chaos
+
+Most sessions are peaceful.
+Exciting events are memorable precisely because they are uncommon.
+
+A. Core Gameplay Loop
+Launch Game
+
+↓
+
+Enter Captain's Quarters
+
+↓
+
+Receive Morning Briefing
+
+↓
+
+Interact With Ship
+
+↓
+
+Choose Daily Activities
+
+↓
+
+Watch Galaxy Progress
+
+↓
+
+Complete Small Goals
+
+↓
+
+End Session
+
+↓
+
+Galaxy Continues Evolving
+
+B. Opening Experience
+
+First launch. Dark screen. Soft orchestral music. Stars slowly appear. A lone starship drifts through space. Title fades in. 
+"QUANTUM EFFECT Captain's Quarters"
+
+Button: Begin Journey
+
+Player taps. Camera slowly approaches the Captain's door. Door slides open. The player walks inside in first-person. The room is quiet. The captain stands before the observation window. Outside—an endless galaxy. Only then does the interface appear. This becomes the player's first memory of the game.
+
+C. Daily Flow
+
+Every day begins naturally.
+
+Instead of notifications...
+
+The AI welcomes the captain.
+
+Example:
+
+"Good morning, Captain.
+
+Ship time: 08:13.
+
+Crew morale remains excellent.
+
+Long-range sensors have detected unusual Quantum activity.
+
+Coffee has been prepared."
+
+D. Captain's Quarter
+The room itself becomes the interface.
+
+Observation Window -
+View galaxy
+Weather effects
+Passing ships
+Nebulae
+Planets
+Comets
+Major events
+
+Captain's Desk -
+Access:
+Galaxy Map
+Missions
+Captain's Log
+Mail
+Research
+Finances
+
+AI Terminal -
+Ship reports
+Crew updates
+Personal assistant
+Daily reflections
+
+Coffee Corner- 
+Small relaxing interactions.
+Different drinks.
+Temporary ambience buffs.
+
+Bookshelf -
+Stores:
+discovered species
+civilizations
+stories
+music
+artwork
+memories
+
+Display Shelf -
+Player achievements.
+Alien artifacts.
+Models.
+Photographs.
+Crew gifts.
+
+Personal Decorations -
+Every player slowly creates a unique cabin.
+
+E. Dynamic World
+The real world subtly influences the simulation.
+
+Local Time -
+Morning:
+Crew eating breakfast.
+Afternoon:
+Engine room active.
+Evening:
+Recreation.
+Night:
+Bridge lights dim.
+
+Weather - 
+Rather than copying weather directly...
+Translate it into sci-fi language.
+Rain
+↓
+Quantum storm
+
+Sunny
+↓
+Clear stellar lanes
+
+Snow
+↓
+Ice comet shower
+
+Fog
+↓
+Dense nebula
+
+Thunderstorm
+↓
+Electromagnetic interference
+
+This keeps immersion intact.
+
+F. Captain's Log
+
+Every day the AI asks:
+"Captain...
+Would you like to record today's thoughts?"
+
+Player writes anything.
+These become:
+Captain's Personal Journal.
+
+Months later...
+Reading old entries becomes part of the game.
+
+G. Quantum Resonance Forecast
+Instead of horoscope.
+The AI generates a fictional daily report.
+
+Example:
+"Quantum Resonance
+
+Field Stability
+
+84%
+
+Exploration Probability
+
+High
+
+Crew Harmony
+
+Excellent
+
+Scientific Discovery
+
+Moderate
+
+Temporal Echoes
+
+Low"
+
+These influence:
+
+ambient dialogue
+visuals
+event flavor
+exploration themes
+
+Rather than making real-world predictions.
+
+H. Crew System
+
+Crew are companions.
+
+Each has:
+
+schedule
+hobbies
+friendships
+memories
+birthdays
+favorite meals
+personal projects
+
+Over months they grow.
+
+Some retire.
+
+Some join.
+
+Some become lifelong friends.
+
+I. The Living Ship
+
+Everything progresses over time.
+
+Plants grow.
+
+Fish reproduce.
+
+Research completes.
+
+Decorations accumulate.
+
+Windows change.
+
+Crew decorate shared spaces.
+
+The ship slowly becomes unmistakably yours.
+
+J. Progression Philosophy
+
+Players don't chase levels.
+
+They build a meaningful life.
+
+Progress is measured by:
+
+memories
+relationships
+discoveries
+journals
+ship customization
+reputation
+knowledge
+
+K. Future Expansion Compatibility
+
+Captain's Quarters is the hub for future Quantum Effect experiences.
+
+Potential expansions include:
+
+Quantum Expeditions – exploration missions to unexplored systems.
+Frontier Colonies – establish and manage settlements on distant worlds.
+Fleet Command – oversee multiple ships and strategic operations.
+Galactic Commerce – trading, manufacturing, and an evolving economy.
+Quantum Legends – the original open-world RPG vision.
+
+All future games can share the same save file and captain identity.
+
+L. Technical Philosophy - not final, feasibility and achievability come first.
+Engine: Not decided, please consider C# if applicable. Decide based on feasibility.
+Architecture: Modular, event-driven, service-oriented, following the Quantum Engine roadmap established in the earlier prototype.
+Platform: Mobile-first, with desktop support.
+Session Length: 5–15 minutes.
+Offline Support: Most simulation systems continue locally and reconcile when online features are available.
+Save System: Versioned save files to ensure long-term compatibility as new modules are added.
+
+M. Development Roadmap
+Phase 1 — The Room
+Opening cinematic
+Captain's Quarter
+Basic UI
+Save system
+Ambient soundtrack
+
+Phase 2 — Daily Life
+AI assistant
+Captain's Log
+Daily briefing
+Calendar
+Dynamic ambience
+
+Phase 3 — Crew
+Crew schedules
+Relationships
+Conversations
+Crew tasks
+
+Phase 4 — Galaxy
+Star map
+Events
+Trade
+Exploration reports
+
+Phase 5 — Living Universe
+Economy simulation
+Procedural discoveries
+Long-term progression
+Seasonal events
