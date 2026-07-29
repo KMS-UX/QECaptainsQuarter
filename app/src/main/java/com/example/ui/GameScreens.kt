@@ -6189,36 +6189,40 @@ fun PetIncubatorSanctuaryObject(
 
 @Composable
 fun BiomechanicalGreenhouseBackground() {
-    Canvas(modifier = Modifier.fillMaxSize()) {
-        // Deep rich forest green to obsidian gradient
-        drawRect(
-            brush = Brush.verticalGradient(
-                colors = listOf(
-                    Color(0xFF012110),
-                    Color(0xFF02170D),
-                    Color(0xFF030A06)
-                )
-            )
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Painted hydro-bay backdrop - same treatment as the Captain's Quarters
+        // wallpaper, cropped/scaled to fill the panorama via ContentScale.Crop
+        Image(
+            painter = painterResource(id = R.drawable.img_greenhouse_bay),
+            contentDescription = "Biomechanical Greenhouse Bay",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
         )
-        
-        // Cybernetic grid lines and biomechanical curves
-        // Horizontal scanline lines
-        for (y in 0..size.height.toInt() step 80) {
-            drawLine(
-                color = Color(0xFF10B981).copy(alpha = 0.08f),
-                start = Offset(0f, y.toFloat()),
-                end = Offset(size.width, y.toFloat()),
-                strokeWidth = 1f
-            )
-        }
-        // Vertical arch structures representing greenhouse domes
-        for (x in 0..size.width.toInt() step 160) {
-            drawLine(
-                color = Color(0xFF10B981).copy(alpha = 0.08f),
-                start = Offset(x.toFloat(), 0f),
-                end = Offset(x.toFloat(), size.height),
-                strokeWidth = 1f
-            )
+        // Obsidian scrim so foreground props/text stay legible over the artwork
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFF02170D).copy(alpha = 0.35f),
+                            Color.Transparent,
+                            Color(0xFF030A06).copy(alpha = 0.55f)
+                        )
+                    )
+                )
+        )
+        // Faint tech scanlines carried over from the procedural version, for
+        // continuity with the other decks' HUD-grid texture
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            for (y in 0..size.height.toInt() step 80) {
+                drawLine(
+                    color = Color(0xFF10B981).copy(alpha = 0.06f),
+                    start = Offset(0f, y.toFloat()),
+                    end = Offset(size.width, y.toFloat()),
+                    strokeWidth = 1f
+                )
+            }
         }
     }
 }
@@ -6360,29 +6364,42 @@ fun GreenhouseFoliageProp(modifier: Modifier = Modifier) {
 
 @Composable
 fun AquariumLoungeBackground() {
-    Canvas(modifier = Modifier.fillMaxSize()) {
-        // Deep aquatic blue gradient
-        drawRect(
-            brush = Brush.verticalGradient(
-                colors = listOf(
-                    Color(0xFF011424),
-                    Color(0xFF010C1A),
-                    Color(0xFF01050D)
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Painted viewing-bay backdrop - big reef tank, jellyfish and a whale
+        // shark silhouette, in place of the old flat blue gradient
+        Image(
+            painter = painterResource(id = R.drawable.img_aquarium_lounge),
+            contentDescription = "Aquarium Lounge Viewing Bay",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFF010C1A).copy(alpha = 0.35f),
+                            Color.Transparent,
+                            Color(0xFF01050D).copy(alpha = 0.55f)
+                        )
+                    )
                 )
+        )
+        // Subtle underwater light rays carried over from the procedural version
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val path = Path()
+            path.moveTo(0f, 0f)
+            path.lineTo(size.width * 0.3f, 0f)
+            path.lineTo(size.width * 0.45f, size.height)
+            path.lineTo(size.width * 0.1f, size.height)
+            path.close()
+
+            drawPath(
+                path = path,
+                color = CyberCyan.copy(alpha = 0.05f)
             )
-        )
-        // Draw subtle underwater light rays
-        val path = Path()
-        path.moveTo(0f, 0f)
-        path.lineTo(size.width * 0.3f, 0f)
-        path.lineTo(size.width * 0.45f, size.height)
-        path.lineTo(size.width * 0.1f, size.height)
-        path.close()
-        
-        drawPath(
-            path = path,
-            color = CyberCyan.copy(alpha = 0.05f)
-        )
+        }
     }
 }
 
@@ -6543,33 +6560,38 @@ fun AquariumViewingBayObject(
 
 @Composable
 fun CrewHabitationBackground() {
-    Canvas(modifier = Modifier.fillMaxSize()) {
-        // Deep amethyst and obsidian gradient
-        drawRect(
-            brush = Brush.verticalGradient(
-                colors = listOf(
-                    Color(0xFF140520),
-                    Color(0xFF0C0215),
-                    Color(0xFF05010A)
-                )
-            )
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Painted bunk-corridor backdrop - stairs, lockers and the amber-lit
+        // sleeping alcoves, in place of the old flat amethyst gradient
+        Image(
+            painter = painterResource(id = R.drawable.img_crew_habitation),
+            contentDescription = "Crew Habitation Corridor",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
         )
-        // Tech bulkhead lines
-        for (y in 0..size.height.toInt() step 120) {
-            drawLine(
-                color = Color(0xFFC084FC).copy(alpha = 0.06f),
-                start = Offset(0f, y.toFloat()),
-                end = Offset(size.width, y.toFloat()),
-                strokeWidth = 2f
-            )
-        }
-        for (x in 0..size.width.toInt() step 200) {
-            drawLine(
-                color = Color(0xFFC084FC).copy(alpha = 0.06f),
-                start = Offset(x.toFloat(), 0f),
-                end = Offset(x.toFloat(), size.height),
-                strokeWidth = 1f
-            )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFF0C0215).copy(alpha = 0.35f),
+                            Color.Transparent,
+                            Color(0xFF05010A).copy(alpha = 0.55f)
+                        )
+                    )
+                )
+        )
+        // Tech bulkhead lines carried over from the procedural version
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            for (y in 0..size.height.toInt() step 120) {
+                drawLine(
+                    color = Color(0xFFC084FC).copy(alpha = 0.05f),
+                    start = Offset(0f, y.toFloat()),
+                    end = Offset(size.width, y.toFloat()),
+                    strokeWidth = 2f
+                )
+            }
         }
     }
 }

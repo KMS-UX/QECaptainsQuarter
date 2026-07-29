@@ -4,7 +4,7 @@ Living document for tracking the ship-immersion redesign initiative. See
 `Quantum Effect Captain's Quarters Build Bible.txt` for the full design vision;
 this file tracks *implementation* status against it.
 
-Last updated: 2026-07-29 (session 2)
+Last updated: 2026-07-29 (session 3)
 
 ## Current initiative: "Dynamic wallpaper" starship
 
@@ -36,8 +36,67 @@ with real spatial compositions (corridors, lounges) that reward swiping.
 
 | 4 | (unmerged, this branch) | **Greenhouse / Plantation deck**: replaced the centered `Row(SpaceEvenly)` layout with the same corridor/lounge recipe as PRs #2/#3. Added `GreenhouseStructure` (floor perspective + recessed growing-bay niches behind each prop) and `GreenhouseFoliageProp` (decorative swaying wall-planter, purely ambient) to `GameScreens.kt`. `GreenhousePodObject`/`GreenhouseClimateConsole` got a `modifier: Modifier = Modifier` first param (existing recipe step 3) so they can be placed with absolute offsets. Hydro-Pod Alpha/Beta, the Climate Console, and the elevator are now spread across x-fractions `[0.08, 0.28, 0.52, 0.88]` of the 1380dp panorama, with two foliage props filling the gaps. Also added a per-hotspot `zoomPivotOverride` for the pods/console (same fix PR #2 applied to Crew doors) since they no longer share one on-screen position, so the old single fixed `CabinetNode.GREENHOUSE` pivot would have zoomed toward the wrong spot depending which prop was tapped. |
 
-All three merged PRs confirmed green on the `Build Android APK` GitHub Actions
-workflow after merge. PR #4 (this session) not yet opened/merged — see below.
+| 5 | (unmerged, this branch) | **Real painted pixel-art backgrounds for the 3 non-Captain's-Quarters decks.** The user uploaded a `VisualAssets/` folder to `main` (merged into this branch) containing ~19 reference-sheet PNGs from an art pass done outside this session. Three of them — `QE_BKG_GREENHOUSE.png`, `QE_BKG_AQUARIUM.png`, `QE_BKG_CREWBAY.png` — are full painted scenes matching the style/quality of the existing `img_cozy_cabin.jpg` Captain's Quarters wallpaper. Converted to JPEG (`img_greenhouse_bay.jpg`, `img_aquarium_lounge.jpg`, `img_crew_habitation.jpg` in `app/src/main/res/drawable/`) and wired into `BiomechanicalGreenhouseBackground()`, `AquariumLoungeBackground()`, `CrewHabitationBackground()` using the exact same `Image(..., contentScale = ContentScale.Crop)` pattern the Captain's Quarters wallpaper already uses, replacing the old flat procedural gradients. Kept a translucent scrim + the existing low-alpha scanline/bulkhead Canvas overlays on top for hotspot-label legibility and continuity with Captain's Quarters' own weather-tint treatment. All 4 decks now have a real painted backdrop, not just Captain's Quarters. |
+
+All three original PRs confirmed green on the `Build Android APK` GitHub
+Actions workflow after merge. PR #4 and this asset-integration work (PR #5)
+not yet opened/merged — see below.
+
+### VisualAssets inventory — what's usable vs. reference-only
+
+The full `VisualAssets/` folder (19 PNGs + a placeholder note) is now on
+`main`. Only the 3 backgrounds above were wired in this session — everything
+else is either a labeled *reference sheet* (multiple small icons on a plain
+grey background, meant to be cropped) or drawn in a different visual language
+than the current game and needs a deliberate decision before use:
+
+- **Directly usable, not yet wired in:**
+  - `CoffeeBrewingCycle.png` — a clean 10-frame brewing-animation sprite
+    sheet for an isometric coffee machine. Not used: the existing
+    `CoffeeBrewingObject` (`GameScreens.kt`) is a hand-drawn Canvas-vector mug,
+    matching every other Captain's Quarters hotspot (window, AI core, desk,
+    bookshelf, elevator are all Canvas-vector too). Dropping in one raster
+    sprite next to five vector props would break that established "painted
+    background + vector foreground props" language — the same language the
+    3 new deck backgrounds above deliberately preserve. Worth a proper look
+    if/when the whole hotspot layer moves to sprite art at once, not
+    piecemeal.
+  - `WeatherOverlay.png` — nebula-shift, ice-comet-shower, and EMI-storm
+    overlay textures that map almost exactly onto the Build Bible's weather
+    translation table (fog→dense nebula, snow→ice comet shower,
+    thunderstorm→EMI) and the existing `WeatherOverlayEffect`/
+    `getWeatherColor()` functions. Strong next-session candidate.
+  - `LivingUniverse_Progression.png` — includes 3 clean plant-growth-stage
+    icons (`QE_DEC_013/014/015`, sapling → mature) that could replace/augment
+    the Canvas-drawn `PlantVisualStem` in the greenhouse ecosystem tab.
+  - `QE_FUR_CON.png` — a big furniture/console reference sheet including a
+    `DisplayCabinet` and `Bookshelf` icon (matches the Build Bible's "Display
+    Shelf" section) and an `AICoreConsole` icon.
+- **Reference/mockup only, not directly droppable:**
+  - `DesktopProp_CaptainLogJournal.png`, `UIFrame_AIWelcomePrompt.png` — concept
+    mockups with baked-in UI text/labels overlaid on a screenshot-like
+    background; would need the text/background removed before the prop art
+    (an open journal, a dialogue frame) could be extracted cleanly. No image
+    editing tool available in this sandbox beyond crop/resize (Pillow), so
+    isolating just the prop without the baked text wasn't attempted.
+  - `CrewSystem.png`, `QE_CREW_INTER.png` — generic crewman/crewwoman walk
+    cycles and a "First Officer" portrait (teal-haired, white/red uniform).
+    Doesn't match any of the 4 real companions' `colorHex`/role (Lyra, Nova,
+    Elara, Quark) — using it would mean either inventing a 5th companion or
+    mismatching an existing one's established look. Needs a product decision,
+    not a code change.
+  - `GalaxyExploration.png`, `QE_EXPAN_SEASONAL.png`, `QE_CON_DEC_EXT_MISC.png`,
+    `QE_ENG_DEC.png` — Phase 4/5/6 icon sheets (star map, trade routes, planet
+    sprites, decorations, engineering props) for systems that don't exist yet
+    in `GameViewModel` (no star map screen, no trade mechanic). Premature to
+    wire in before the underlying feature exists.
+  - `QE_INF1.png`, `QE_INF2.png`, `QE_EXT1.png` — a full isometric
+    wall/floor/ceiling/door tile-kit and exterior hull modules. Drawn in a
+    true isometric-tile style, which is a different rendering approach than
+    this game's current flat side-view panorama (`CabinView`'s
+    `horizontalScroll` + `graphicsLayer` zoom). Using these would mean
+    building an isometric room renderer, not a drop-in art swap — a much
+    bigger architectural decision.
 
 ### Not started yet
 - **Individual companion rooms (visual, not just routing)** — PR #2 made each
@@ -103,12 +162,22 @@ workflow after merge. PR #4 (this session) not yet opened/merged — see below.
 
 ## Suggested next session
 
-Greenhouse deck now has its spatial pass (see PR #4 row above), so all 4 decks
-have the corridor/lounge/bay treatment. Next up per the "Not started yet" list:
-either the **individual companion room decor** pass (bigger, more creative —
-needs per-companion themed visuals), or push further into the **detail panel**
-polish (Captain's Desk / AI Terminal / Bookshelf / Coffee Corner) now that the
-room layer is consistent across all decks. No local Android SDK in this
-sandbox either — same verification method as prior sessions: careful manual
-review of Compose API usage (brace/paren balance checked with a script) plus
-watching the `Build Android APK` GitHub Actions workflow after push/merge.
+All 4 decks now have both the spatial (corridor/lounge/bay) pass *and* a real
+painted background. Good next candidates, roughly in order of how directly
+they drop into existing code:
+1. **Weather overlay art** (`WeatherOverlay.png`) — swap/augment
+   `WeatherOverlayEffect` and `getWeatherColor()` with the nebula/ice/EMI
+   textures from `VisualAssets/`, matching the Build Bible's weather
+   translation table.
+2. **Plant growth-stage sprites** (`LivingUniverse_Progression.png`) into
+   `PlantVisualStem`.
+3. Either the **individual companion room decor** pass (bigger, more
+   creative — needs new art or a product decision per companion), or the
+   **detail panel** polish (Captain's Desk / AI Terminal / Bookshelf / Coffee
+   Corner).
+
+No local Android SDK in this sandbox either — same verification method as
+prior sessions: careful manual review of Compose API usage (brace/paren
+balance checked with a script), Pillow available in-sandbox for any future
+image cropping/resizing needs, plus watching the `Build Android APK` GitHub
+Actions workflow after push/merge.
