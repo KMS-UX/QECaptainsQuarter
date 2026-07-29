@@ -493,6 +493,9 @@ fun CabinView(state: GameUiState, viewModel: GameViewModel) {
     val scrollState = rememberScrollState()
     var activeDeck by remember { mutableStateOf(StarshipDeck.CAPTAINS_QUARTERS) }
     var zoomedNode by remember { mutableStateOf<CabinetNode?>(null) }
+    // Lets a specific hotspot instance (e.g. one of several crew doors sharing
+    // CabinetNode.CREW) steer the zoom toward its own on-screen position
+    var zoomPivotOverride by remember { mutableStateOf<Pair<Float, Float>?>(null) }
 
     // Elevator transit states
     var isElevatorTransiting by remember { mutableStateOf(false) }
@@ -510,13 +513,14 @@ fun CabinView(state: GameUiState, viewModel: GameViewModel) {
                 // When zoom animation completes, activate the corresponding panel and reset zoom
                 viewModel.setNode(zoomedNode!!)
                 zoomedNode = null
+                zoomPivotOverride = null
             }
         },
         label = "room_zoom"
     )
 
     val pivotX by animateFloatAsState(
-        targetValue = when (zoomedNode) {
+        targetValue = zoomPivotOverride?.first ?: when (zoomedNode) {
             CabinetNode.WINDOW -> 0.08f
             CabinetNode.AI -> 0.28f
             CabinetNode.DESK -> 0.48f
@@ -534,7 +538,7 @@ fun CabinView(state: GameUiState, viewModel: GameViewModel) {
     )
 
     val pivotY by animateFloatAsState(
-        targetValue = when (zoomedNode) {
+        targetValue = zoomPivotOverride?.second ?: when (zoomedNode) {
             CabinetNode.WINDOW -> 0.22f
             CabinetNode.AI -> 0.38f
             CabinetNode.DESK -> 0.65f
@@ -774,41 +778,49 @@ fun CabinView(state: GameUiState, viewModel: GameViewModel) {
                         }
                     }
                     StarshipDeck.CREW_HABITATION -> {
+                        // Real companions from the roster, each with their own door down the hall -
+                        // no more stand-in placeholders that don't match anyone aboard
+                        val alcoveFractions = listOf(0.06f, 0.24f, 0.42f, 0.60f, 0.76f, 0.90f)
+
                         CrewHabitationBackground()
+                        CrewCorridorStructure(alcoveXFractions = alcoveFractions)
                         CrewHabitationParticles()
 
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 110.dp),
-                            horizontalArrangement = Arrangement.SpaceEvenly,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
+                        state.companions.take(4).forEachIndexed { index, companion ->
                             CompanionHabitationRoomObject(
-                                name = "JAX",
-                                role = "BIO-MECHANIC ENGINEER",
-                                color = Color(0xFFFFB300),
-                                activeQuest = "DRONE GRID ACTIVE",
-                                onClick = { if (zoomedNode == null) zoomedNode = CabinetNode.CREW }
-                            )
-
-                            CompanionHabitationRoomObject(
-                                name = "LYRA",
-                                role = "TACTICAL FOCUS OPERATIVE",
-                                color = Color(0xFFC084FC),
-                                activeQuest = "TACTICAL FOCUS STABLE",
-                                onClick = { if (zoomedNode == null) zoomedNode = CabinetNode.CREW }
-                            )
-
-                            PetIncubatorSanctuaryObject(
-                                petCount = state.recruitedPets.size,
-                                onClick = { if (zoomedNode == null) zoomedNode = CabinetNode.PET_SANCTUARY }
-                            )
-
-                            StarshipElevatorHotspot(
-                                onClick = { if (zoomedNode == null) zoomedNode = CabinetNode.ELEVATOR }
+                                modifier = Modifier
+                                    .align(Alignment.TopStart)
+                                    .offset(x = 1380.dp * alcoveFractions[index], y = 150.dp),
+                                name = companion.name.uppercase(),
+                                role = companion.role.uppercase(),
+                                color = parseHexColor(companion.colorHex),
+                                activeQuest = companion.statusText,
+                                onClick = {
+                                    if (zoomedNode == null) {
+                                        // Walking up to THIS door drops the captain straight into
+                                        // this companion's own quarters, not a roster menu
+                                        viewModel.selectCompanionChat(companion.id)
+                                        zoomPivotOverride = alcoveFractions[index] to 0.42f
+                                        zoomedNode = CabinetNode.CREW
+                                    }
+                                }
                             )
                         }
+
+                        PetIncubatorSanctuaryObject(
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .offset(x = 1380.dp * alcoveFractions[4], y = 160.dp),
+                            petCount = state.recruitedPets.size,
+                            onClick = { if (zoomedNode == null) zoomedNode = CabinetNode.PET_SANCTUARY }
+                        )
+
+                        StarshipElevatorHotspot(
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .offset(x = 1380.dp * alcoveFractions[5], y = 130.dp),
+                            onClick = { if (zoomedNode == null) zoomedNode = CabinetNode.ELEVATOR }
+                        )
                     }
                 }
             }
@@ -5940,6 +5952,7 @@ fun LoungeJukeboxObject(
 
 @Composable
 fun CompanionHabitationRoomObject(
+    modifier: Modifier = Modifier,
     name: String,
     role: String,
     color: Color,
@@ -5958,7 +5971,7 @@ fun CompanionHabitationRoomObject(
     )
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .width(130.dp)
             .clickable(onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -6047,6 +6060,7 @@ fun CompanionHabitationRoomObject(
 
 @Composable
 fun PetIncubatorSanctuaryObject(
+    modifier: Modifier = Modifier,
     petCount: Int,
     onClick: () -> Unit
 ) {
@@ -6062,7 +6076,7 @@ fun PetIncubatorSanctuaryObject(
     )
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .width(120.dp)
             .clickable(onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -6328,6 +6342,61 @@ fun CrewHabitationParticles() {
                 color = Color(0xFFC084FC).copy(alpha = twinkleAlpha),
                 radius = 3f,
                 center = coord
+            )
+        }
+    }
+}
+
+// A receding hallway structure with recessed door alcoves, so the habitation
+// deck reads as a corridor the captain walks down rather than a flat backdrop
+@Composable
+fun CrewCorridorStructure(alcoveXFractions: List<Float>) {
+    Canvas(modifier = Modifier.fillMaxSize()) {
+        val w = size.width
+        val h = size.height
+        val floorY = h * 0.92f
+        val vanishX = w * 0.5f
+        val vanishY = h * 0.5f
+
+        // Floor perspective lines converging toward a vanishing point down the hall
+        for (i in 0..8) {
+            val fx = w * (i / 8f)
+            drawLine(
+                color = Color(0xFFC084FC).copy(alpha = 0.1f),
+                start = Offset(fx, floorY),
+                end = Offset(vanishX, vanishY),
+                strokeWidth = 1.5f
+            )
+        }
+        drawLine(
+            color = Color(0xFFC084FC).copy(alpha = 0.18f),
+            start = Offset(0f, floorY),
+            end = Offset(w, floorY),
+            strokeWidth = 2f
+        )
+
+        // Ceiling light strip running the length of the corridor
+        drawLine(
+            color = Color(0xFFC084FC).copy(alpha = 0.3f),
+            start = Offset(0f, h * 0.08f),
+            end = Offset(w, h * 0.08f),
+            strokeWidth = 3f
+        )
+
+        // Recessed alcove behind each door, for depth
+        for (fx in alcoveXFractions) {
+            val cx = w * fx
+            drawRoundRect(
+                color = Color.Black.copy(alpha = 0.28f),
+                topLeft = Offset(cx - w * 0.06f, h * 0.14f),
+                size = androidx.compose.ui.geometry.Size(w * 0.12f, h * 0.64f),
+                cornerRadius = androidx.compose.ui.geometry.CornerRadius(10f, 10f)
+            )
+            drawLine(
+                color = Color(0xFFC084FC).copy(alpha = 0.12f),
+                start = Offset(cx, h * 0.14f),
+                end = Offset(cx, floorY),
+                strokeWidth = 1f
             )
         }
     }
