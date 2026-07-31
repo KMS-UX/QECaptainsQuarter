@@ -1,0 +1,50 @@
+<!-- @dsCard group="Guidelines" viewport="820x560" name="Game content data layer" subtitle="assets/data/ — one canonical source the cards preview from and the game ships unchanged" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>
+body{margin:0;padding:22px;background:var(--surface-page);color:var(--fg-1);font-family:var(--font-ui)}
+h1{font-family:var(--font-display);font-size:18px;letter-spacing:.08em;text-transform:uppercase;margin:0 0 4px}
+.sub{color:var(--text-muted);font-size:12px;margin-bottom:20px}
+.h{font-family:var(--font-display);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-section);margin:18px 0 8px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+td,th{text-align:left;padding:7px 10px;border-bottom:1px solid var(--border-panel)}
+th{font-family:var(--font-display);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-faint)}
+code{font-family:var(--font-mono,monospace);font-size:11.5px;color:var(--teal);background:var(--surface-inset);padding:1px 5px;border-radius:3px}
+pre{background:var(--surface-inset);border:1px solid var(--border-panel);border-radius:var(--radius-1);padding:14px;font-family:var(--font-mono,monospace);font-size:11.5px;line-height:1.55;color:var(--fg-1);overflow:auto;margin:0}
+.n{color:var(--text-muted)}
+</style></head><body>
+<h1>Game content data layer</h1>
+<div class="sub">Lore, rosters and tables live once in <code>assets/data/</code> as plain JSON. Preview cards fetch them, and the game engine ships the same files unchanged — no copy-paste, no drift.</div>
+
+<div class="h">Files</div>
+<table>
+<tr><th>File</th><th>Shape</th><th>Powers</th></tr>
+<tr><td><code>factions.json</code></td><td class="n">id, name, motto, colorToken, alignment, hub</td><td class="n">Faction colors, reputation UI</td></tr>
+<tr><td><code>companions.json</code></td><td class="n">id, name, roles[], rarity, faction, sprite, bond, ability</td><td class="n">Party & recruitment screens</td></tr>
+<tr><td><code>bosses.json</code></td><td class="n">id, name, tier, element, region, art</td><td class="n">Bestiary, encounter intros</td></tr>
+<tr><td><code>elements.json</code></td><td class="n">elements[], hazards[]</td><td class="n">ElementCard, HazardBadge</td></tr>
+<tr><td><code>rarities.json</code></td><td class="n">id, name, colorToken</td><td class="n">Rarity mapping across all cards</td></tr>
+<tr><td><code>items.json</code></td><td class="n">id, name, type, rarity, icon</td><td class="n">Item icons, inventory, loot</td></tr>
+<tr><td><code>regions.json</code></td><td class="n">worldmaps[], regions[] (id, name, faction, biome, art)</td><td class="n">World map, region cards</td></tr>
+<tr><td><code>characters.json</code></td><td class="n">portraitGroups[] (label, dir, portraits[])</td><td class="n">Portrait library, codex, dialogue</td></tr>
+<tr><td><code>quests.json</code></td><td class="n">id, tier, title, level, region, objectives[], rewards</td><td class="n">QuestCard, tracker, journal</td></tr>
+<tr><td><code>catalog.json</code></td><td class="n">galleries{} (base, label, entries[])</td><td class="n">Raw-art reference cards + asset-import pipeline</td></tr>
+<tr><td><code>audio.json</code></td><td class="n">cues{} (category, file, desc), categories{}</td><td class="n">UI-event → sound-cue routing (see Audio cues)</td></tr>
+<tr><td><code>strings.json</code></td><td class="n">strings{} — dotted key → copy (+ strings.&lt;locale&gt;.json)</td><td class="n">Localized UI copy (see Localization)</td></tr>
+<tr><td><code>index.json</code></td><td class="n">schema, updated, files{}</td><td class="n">Manifest for tooling / build steps</td></tr>
+</table>
+
+<div class="h">Consume it — browser</div>
+<pre>&lt;script src="../assets/data/content.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  QEContent.load('../assets/data').then(({companions, rarities}) =&gt; {
+    // render with real, canonical data
+  });
+&lt;/script&gt;</pre>
+
+<div class="h">Consume it — game / build tooling</div>
+<pre>const { companions } = require('./assets/data/companions.json');
+// colorToken maps straight onto the shared CSS custom properties,
+// so the same rarity/faction colors appear in-engine and in the DS.</pre>
+
+<div class="h">Editing rule</div>
+<div class="sub" style="margin:8px 0 0">Change data here, nowhere else. Sprite/art paths are relative to <code>/assets</code>; <code>colorToken</code> values reference tokens already defined in <code>tokens/colors.css</code>.</div>
+</body></html>

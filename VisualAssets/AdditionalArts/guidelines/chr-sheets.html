@@ -1,0 +1,16 @@
+<!-- @dsCard group="Characters" viewport="860x560" name="Character reference sheets" subtitle="Full annotated bibles — portrait library, dialogue expressions, companion guide & NPC profession reference" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>
+body{margin:0;padding:16px;background:var(--surface-page);color:var(--text-primary);display:flex;flex-direction:column;gap:14px}
+p{margin:0;font-size:11px;line-height:1.5;color:var(--text-secondary,#8aa)}
+figure{margin:0;position:relative;border:1px solid var(--border-panel);border-radius:var(--radius-1);overflow:hidden;background:var(--surface-inset)}
+figure img{width:100%;display:block}
+figcaption{position:absolute;top:8px;left:8px;padding:3px 9px;background:rgba(3,6,12,.74);border:1px solid var(--border-panel);border-radius:var(--radius-1);font-family:var(--font-display);font-size:9px;letter-spacing:.1em;text-transform:uppercase}
+</style></head><body>
+<p>Full annotated production bibles — reference for portrait styling (standard / dramatic / stylized, anchor & safe area), standardized dialogue expressions & emotion intensity, companion roles / rarity / bond growth, and the 96-strong NPC profession roster with visual-language rules.</p>
+<div id="g" style="display:flex;flex-direction:column;gap:14px"></div>
+<script>
+const B='../assets/characters/sheets/';
+const L=[['portrait-library','Pixel Portrait Library'],['dialogue-expression','Dialogue Expression Reference'],['companion-reference','Companion Reference Guide'],['npc-profession-reference','NPC Profession Reference']];
+g.innerHTML=L.map(([f,n])=>`<figure><img src="${B}${f}.png" alt="${n}"><figcaption>${n}</figcaption></figure>`).join('');
+</script>
+</body></html>

@@ -1,0 +1,26 @@
+<!-- @dsCard group="World & Dungeon" viewport="860x620" name="World map & regions" subtitle="Open-world overview + 6 themed region backdrops for exploration, region cards & loading screens" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>
+body{margin:0;padding:16px;background:var(--surface-page);color:var(--text-primary);display:flex;flex-direction:column;gap:14px}
+.hero{position:relative;border:1px solid var(--border-panel);border-radius:var(--radius-1);overflow:hidden;background:var(--surface-inset)}
+.hero img{width:100%;display:block}
+.tag{position:absolute;top:8px;left:8px;padding:3px 8px;background:rgba(3,6,12,.72);border:1px solid var(--border-panel);border-radius:var(--radius-1);font-family:var(--font-display);font-size:9px;letter-spacing:.12em;text-transform:uppercase}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.r{position:relative;border:1px solid var(--border-panel);border-radius:var(--radius-1);overflow:hidden;aspect-ratio:16/11;background:var(--surface-inset)}
+.r img{width:100%;height:100%;object-fit:cover;display:block}
+.r figcaption{position:absolute;left:0;right:0;bottom:0;padding:5px 7px;background:linear-gradient(transparent,rgba(3,6,12,.94));font-family:var(--font-display);font-size:9px;letter-spacing:.08em;text-transform:uppercase}
+h4{margin:2px 0 -2px;font-family:var(--font-display);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-secondary,#8aa)}
+</style></head><body>
+<figure class="hero" id="ov" style="margin:0"></figure>
+<h4>Region backdrops</h4>
+<div class="grid" id="g"></div>
+<figure class="hero" id="an" style="margin:0"></figure>
+<script src="../assets/data/content.js"></script>
+<script>
+QEContent.load('../assets/data').then(({worldmaps,regions})=>{
+  const[ovM,anM]=worldmaps;
+  ov.innerHTML=`<img src="../assets/${ovM.art}" alt="${ovM.name}"><span class="tag">${ovM.name}</span>`;
+  an.innerHTML=`<img src="../assets/${anM.art}" alt="${anM.name}"><span class="tag">${anM.name}</span>`;
+  g.innerHTML=regions.map(r=>`<figure class="r"><img src="../assets/${r.art}" alt="${r.name}"><figcaption>${r.name}</figcaption></figure>`).join('');
+});
+</script>
+</body></html>

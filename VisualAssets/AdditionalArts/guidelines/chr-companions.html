@@ -1,0 +1,21 @@
+<!-- @dsCard group="Characters" viewport="860x340" name="Companions" subtitle="5 recruitable allies — data-driven from assets/data/companions.json" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>
+body{margin:0;padding:16px;background:var(--surface-page);color:var(--fg-1)}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.c{border:1px solid var(--border-panel);border-radius:var(--radius-1);overflow:hidden;background:var(--surface-inset);display:flex;flex-direction:column}
+.c .art{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%,rgba(255,255,255,.05),transparent 70%)}
+.c .art img{width:88%;height:88%;object-fit:contain;image-rendering:pixelated}
+.c .meta{padding:7px 9px;border-top:1px solid var(--border-panel)}
+.c .nm{font-family:var(--font-display);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+.c .role{font-size:9.5px;color:var(--text-muted);margin-top:3px}
+.c .rar{font-family:var(--font-display);font-size:8px;letter-spacing:.1em;text-transform:uppercase;margin-top:5px}
+</style></head><body>
+<div class="grid" id="g"></div>
+<script src="../assets/data/content.js"></script>
+<script>
+QEContent.load('../assets/data').then(({companions,rarities})=>{
+  const rar=Object.fromEntries(rarities.map(r=>[r.name,`var(${r.colorToken})`]));
+  g.innerHTML=companions.map(c=>`<div class="c"><div class="art"><img src="../assets/${c.sprite}" alt="${c.name}"></div><div class="meta"><div class="nm">${c.name}</div><div class="role">${c.roles.join(' · ')}</div><div class="rar" style="color:${rar[c.rarity]}">${c.rarity}</div></div></div>`).join('');
+});
+</script>
+</body></html>

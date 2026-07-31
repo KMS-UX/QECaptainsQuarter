@@ -1,0 +1,19 @@
+<!-- @dsCard group="Bestiary" viewport="860x560" name="Bosses" subtitle="12 signature bosses — data-driven from assets/data/bosses.json" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>
+body{margin:0;padding:16px;background:var(--surface-page);color:var(--fg-1)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.b{position:relative;border:1px solid var(--border-panel);border-radius:var(--radius-1);overflow:hidden;aspect-ratio:226/132;background:var(--surface-inset)}
+.b img{width:100%;height:100%;object-fit:cover;display:block}
+.b figcaption{position:absolute;left:0;right:0;bottom:0;padding:5px 7px;background:linear-gradient(transparent,rgba(3,6,12,.94));font-family:var(--font-display);font-size:8.5px;letter-spacing:.07em;text-transform:uppercase}
+.n{position:absolute;top:5px;left:6px;font-family:var(--font-display);font-size:8px;letter-spacing:.1em;color:var(--text-muted);opacity:.85}
+.t{position:absolute;top:5px;right:6px;font-family:var(--font-display);font-size:7px;letter-spacing:.12em;text-transform:uppercase;padding:2px 5px;border:1px solid currentColor;border-radius:2px}
+</style></head><body>
+<div class="grid" id="g"></div>
+<script src="../assets/data/content.js"></script>
+<script>
+const TIER={world:'var(--quest-world)',region:'var(--quest-main)',elite:'var(--quest-faction)'};
+QEContent.load('../assets/data').then(({bosses})=>{
+  g.innerHTML=bosses.map((b,i)=>`<figure class="b"><img src="../assets/${b.art}" alt="${b.name}"><span class="n">${String(i+1).padStart(2,'0')}</span><span class="t" style="color:${TIER[b.tier]}">${b.tier}</span><figcaption>${b.name}</figcaption></figure>`).join('');
+});
+</script>
+</body></html>

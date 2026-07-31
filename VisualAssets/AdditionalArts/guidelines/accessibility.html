@@ -1,0 +1,47 @@
+<!-- @dsCard group="Guidelines" viewport="820x580" name="Accessibility & platform" subtitle="Touch targets, focus & controller nav, reduced motion, contrast — the rules the tokens + lint enforce" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>
+body{margin:0;padding:22px;background:var(--surface-page);color:var(--fg-1);font-family:var(--font-ui)}
+h1{font-family:var(--font-display);font-size:18px;letter-spacing:.08em;text-transform:uppercase;margin:0 0 4px}
+.sub{color:var(--text-muted);font-size:12px;margin-bottom:16px}
+.row{display:flex;gap:14px;margin-bottom:12px}
+.card{flex:1;border:1px solid var(--border-panel);background:var(--void-1);padding:14px}
+.h{font-family:var(--font-display);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-section);margin-bottom:8px}
+.p{font-size:11.5px;color:var(--text-muted);line-height:1.55}
+code{font-family:var(--font-mono,monospace);font-size:11px;color:var(--teal)}
+.demo{display:flex;align-items:center;gap:10px;margin:10px 0 4px}
+.hit{width:44px;height:44px;border:1px dashed var(--teal);display:flex;align-items:center;justify-content:center;color:var(--teal);font-size:9px;text-align:center;line-height:1.1;font-family:var(--font-display)}
+.focusbtn{font-family:var(--font-display);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:9px 16px;background:var(--surface-raised);border:1px solid var(--teal);color:var(--teal);outline:2px solid var(--focus-ring);outline-offset:2px}
+.chip{display:inline-block;font-family:var(--font-mono,monospace);font-size:10px;color:var(--fg-1);background:var(--surface-inset);border:1px solid var(--border-panel);padding:2px 6px;margin:2px 3px 0 0}
+</style></head><body>
+<h1>Accessibility &amp; platform</h1>
+<div class="sub">Console-and-mobile first: every interactive element must be reachable by D-pad/stick, obviously focused, comfortably tappable, and legible. The tokens below are the contract; the design-system lint already flags the raw values that would break it.</div>
+
+<div class="row">
+  <div class="card">
+    <div class="h">Touch / hit targets</div>
+    <div class="p">Interactive targets are at least <code>44&times;44px</code> — use <code>var(--hit-target)</code>, never a smaller literal. Small glyphs get an invisible 44px padded hit area. <em>Raw <code>px</code> values are lint-flagged</em>, which pushes every size onto a spacing token including this one.</div>
+    <div class="demo"><span class="hit">44px</span><span class="p">min tap area · <code>--hit-target</code></span></div>
+  </div>
+  <div class="card">
+    <div class="h">Focus &amp; controller nav</div>
+    <div class="p">Focus is always visible: <code>2px solid var(--focus-ring)</code>, offset. Every screen defines a logical focus order and a sensible default focus. Movement maps to D-pad / left stick; <code>Ⓐ</code> confirm, <code>Ⓑ</code> back, bumpers switch tabs — mirror the control legend shown on each screen.</div>
+    <div class="demo"><span class="focusbtn">Focused</span></div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="card">
+    <div class="h">Reduced motion</div>
+    <div class="p">Honor <code>prefers-reduced-motion</code>: drop transforms and parallax, keep opacity cross-fades, and collapse durations toward <code>--dur-instant</code>. Never gate information or feedback on an animation alone — pair it with a state change.</div>
+  </div>
+  <div class="card">
+    <div class="h">Contrast &amp; legibility</div>
+    <div class="p">Body/label text uses <code>--fg-1</code>/<code>--fg-2</code> on <code>--surface-*</code> for AA contrast; never state meaning by color alone (pair with an icon or label — see status icons). In-game UI text stays ≥ 12px. <em>Raw hex is lint-flagged</em> so color always comes from a contrast-checked token.</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="h">Enforced by the design system</div>
+  <div class="p">Lint (adherence): raw <code>px</code> → spacing token · raw hex → color token · unknown font → Orbitron / Share Tech Mono · component props validated. Tokens: <span class="chip">--hit-target</span><span class="chip">--focus-ring</span><span class="chip">--dur-instant</span><span class="chip">--fg-1…3</span><span class="chip">--fg-disabled</span> — build against these and the rules above hold automatically.</div>
+</div>
+</body></html>

@@ -1,0 +1,24 @@
+<!-- @dsCard group="FX & Animation" viewport="860x560" name="Animation & keyframes" subtitle="Hero action sets, enemy animation cycles & projectile / explosion / impact sequences (32×32, feet-center pivot)" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>
+body{margin:0;padding:16px;background:var(--surface-page);color:var(--text-primary);display:flex;flex-direction:column;gap:16px}
+h4{margin:0 0 -4px;font-family:var(--font-display);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-secondary,#8aa)}
+.stack{display:flex;flex-direction:column;gap:10px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.s{border:1px solid var(--border-panel);border-radius:var(--radius-1);overflow:hidden;background:#05070d}
+.s h5{margin:0;padding:5px 9px;font-family:var(--font-display);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-secondary,#9ab);border-bottom:1px solid var(--border-panel)}
+.s img{width:100%;display:block}
+</style></head><body>
+<h4>Hero action sets</h4>
+<div class="stack" id="hero"></div>
+<h4>Enemy animation cycles</h4>
+<div class="two" id="enemy"></div>
+<h4>Projectiles, explosions & impacts</h4>
+<div class="two" id="fx" style="grid-template-columns:1fr 1fr 1fr"></div>
+<script>
+const B='../assets/fx/animation/';
+function fill(el,list){el.innerHTML=list.map(([f,n])=>`<div class="s"><h5>${n}</h5><img src="${B}${f}.png" alt="${n}"></div>`).join('')}
+fill(hero,[['hero-movement','Movement — idle · walk · run · dash · jump · landing'],['hero-combat','Basic combat — attacks · block · hurt · knockdown'],['hero-skills','Skills — slash · bash · blast · summon · buff · heal']]);
+fill(enemy,[['enemy-slime','Slime'],['enemy-goblin','Goblin'],['enemy-mech-drone','Mech Drone'],['enemy-behemoth','Behemoth']]);
+fill(fx,[['projectiles','Projectiles'],['explosions','Explosions'],['impact-effects','Impact effects']]);
+</script>
+</body></html>

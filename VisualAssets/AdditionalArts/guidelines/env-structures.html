@@ -1,0 +1,22 @@
+<!-- @dsCard group="Environments" viewport="820x420" name="Structures & interiors" subtitle="20 building archetypes + 6 interior environments from the architecture kits" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>
+body{margin:0;padding:16px;background:var(--surface-page);color:var(--text-primary);display:flex;flex-direction:column;gap:16px}
+.h{font-family:var(--font-display);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-section)}
+.b{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.i{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.cell{border:1px solid var(--border-panel);border-radius:var(--radius-1);overflow:hidden;background:var(--surface-inset);display:flex;flex-direction:column}
+.cell img{width:100%;display:block;object-fit:contain;background:#080c14}
+.b .cell img{aspect-ratio:1/1}
+.i .cell img{aspect-ratio:122/74;object-fit:cover}
+.cell span{padding:4px 5px;font-family:var(--font-ui);font-size:7px;letter-spacing:.03em;text-transform:uppercase;color:var(--text-faint);text-align:center}
+</style></head><body>
+<div><div class="h">Building archetypes</div><div class="b" id="b"></div></div>
+<div><div class="h">Interior environments</div><div class="i" id="i"></div></div>
+<script>
+const BB='../assets/environments/buildings/',II='../assets/environments/interiors/';
+const bld=[['corporate-tower','Corp Tower'],['research-facility','Research'],['mega-store','Mega Store'],['bank-headquarters','Bank HQ'],['industrial-plant','Ind. Plant'],['power-station','Power Station'],['mining-complex','Mining'],['factory','Factory'],['residential-block','Residential'],['market-street','Market St.'],['spaceport-terminal','Spaceport'],['trade-outpost','Trade Outpost'],['military-barracks','Barracks'],['defense-tower','Defense Tower'],['command-center','Command'],['fortified-gate','Fort. Gate'],['ancient-temple','Temple'],['ruined-archway','Archway'],['forgotten-stronghold','Stronghold'],['monolith-shrine','Monolith']];
+const intr=[['corporate-office','Corp Office'],['black-market','Black Market'],['spaceport-hangar','Hangar'],['underground-lab','Lab'],['bunker-shelter','Bunker'],['abandoned-hospital','Hospital']];
+document.getElementById('b').innerHTML=bld.map(([f,n])=>`<div class="cell"><img src="${BB}${f}.png"><span>${n}</span></div>`).join('');
+document.getElementById('i').innerHTML=intr.map(([f,n])=>`<div class="cell"><img src="${II}${f}.png"><span>${n}</span></div>`).join('');
+</script>
+</body></html>

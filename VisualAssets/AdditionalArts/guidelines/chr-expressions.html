@@ -1,0 +1,14 @@
+<!-- @dsCard group="Characters" viewport="860x520" name="Dialogue expressions" subtitle="Full emotion ranges for lead cast — drive dialogue & narrative scenes (128×128, eyes-centered anchor)" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>
+body{margin:0;padding:16px;background:var(--surface-page);color:var(--text-primary);display:flex;flex-direction:column;gap:12px}
+.row{border:1px solid var(--border-panel);border-radius:var(--radius-1);overflow:hidden;background:var(--surface-inset)}
+.row h5{margin:0;padding:5px 9px;font-family:var(--font-display);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-secondary,#9ab);border-bottom:1px solid var(--border-panel);background:rgba(255,255,255,.02)}
+.row img{width:100%;display:block}
+</style></head><body>
+<div id="g" style="display:flex;flex-direction:column;gap:12px"></div>
+<script>
+const B='../assets/characters/expressions/';
+const L=[['aurin','Aurin — Main Hero'],['lyra','Lyra — Main Heroine'],['quark','Quark — Companion (Android)'],['kai','Kai — Ally'],['lord-vorax','Lord Vorax — Antagonist']];
+g.innerHTML=L.map(([f,n])=>`<div class="row"><h5>${n}</h5><img src="${B}${f}.png" alt="${n}"></div>`).join('');
+</script>
+</body></html>

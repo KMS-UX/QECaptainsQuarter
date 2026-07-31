@@ -1,0 +1,21 @@
+<!-- @dsCard group="Environments" viewport="820x340" name="Weather & special conditions" subtitle="7 time/weather states + 6 quantum anomaly events for scene ambience" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>
+body{margin:0;padding:16px;background:var(--surface-page);color:var(--text-primary);display:flex;flex-direction:column;gap:16px}
+.h{font-family:var(--font-display);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-section)}
+.row{display:grid;gap:8px}
+.w7{grid-template-columns:repeat(7,1fr)}
+.w6{grid-template-columns:repeat(6,1fr)}
+.t{position:relative;border:1px solid var(--border-panel);border-radius:var(--radius-1);overflow:hidden;aspect-ratio:1/1;background:var(--surface-inset)}
+.t img{width:100%;height:100%;object-fit:cover;display:block}
+.t span{position:absolute;left:0;right:0;bottom:0;padding:4px 5px;background:linear-gradient(transparent,rgba(3,6,12,.92));font-family:var(--font-ui);font-size:7.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--text-primary)}
+</style></head><body>
+<div><div class="h">Time &amp; weather</div><div class="row w7" id="w"></div></div>
+<div><div class="h">Special conditions<span style="color:var(--amb-anomaly-accent);margin-left:8px">quantum anomalies</span></div><div class="row w6" id="c"></div></div>
+<script>
+const W='../assets/environments/weather/',C='../assets/environments/conditions/';
+const wea=[['day','Day'],['night','Night'],['rain','Rain'],['storm','Storm'],['snow','Snow'],['fog','Fog'],['sandstorm','Sandstorm']];
+const con=[['quantum-storm','Quantum Storm'],['solar-flare','Solar Flare'],['radiation-rain','Radiation Rain'],['emp-event','EMP Event'],['gravity-anomaly','Gravity Anomaly'],['void-leak','Void Leak']];
+document.getElementById('w').innerHTML=wea.map(([f,n])=>`<div class="t"><img src="${W}${f}.png"><span>${n}</span></div>`).join('');
+document.getElementById('c').innerHTML=con.map(([f,n])=>`<div class="t"><img src="${C}${f}.png"><span>${n}</span></div>`).join('');
+</script>
+</body></html>

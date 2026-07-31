@@ -1,0 +1,26 @@
+<!-- @dsCard group="World & Dungeon" viewport="860x420" name="Biome tilesets & transitions" subtitle="6 biome tileset swatches + 5 biome-to-biome transition strips (64×64 iso, snap grid)" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>
+body{margin:0;padding:16px;background:var(--surface-page);color:var(--text-primary);display:flex;flex-direction:column;gap:16px}
+h4{margin:0 0 -4px;font-family:var(--font-display);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-secondary,#8aa)}
+.biomes{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.b{position:relative;border:1px solid var(--border-panel);border-radius:var(--radius-1);overflow:hidden;aspect-ratio:88/140;background:var(--surface-inset)}
+.b img{width:100%;height:100%;object-fit:cover;display:block;image-rendering:pixelated}
+.b figcaption{position:absolute;left:0;right:0;bottom:0;padding:4px 5px;background:linear-gradient(transparent,rgba(3,6,12,.94));font-family:var(--font-display);font-size:8px;letter-spacing:.06em;text-transform:uppercase;text-align:center}
+.trans{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.t{position:relative;border:1px solid var(--border-panel);border-radius:var(--radius-1);overflow:hidden;aspect-ratio:172/86;background:var(--surface-inset)}
+.t img{width:100%;height:100%;object-fit:cover;display:block}
+.t figcaption{position:absolute;left:0;right:0;bottom:0;padding:4px 6px;background:linear-gradient(transparent,rgba(3,6,12,.94));font-family:var(--font-display);font-size:8px;letter-spacing:.06em;text-transform:uppercase}
+</style></head><body>
+<h4>Biome tilesets</h4>
+<div class="biomes" id="b"></div>
+<h4>Transition examples</h4>
+<div class="trans" id="t"></div>
+<script src="../assets/data/content.js"></script>
+<script>
+QEContent.loadCatalog('../assets/data').then(g=>{
+  const bi=g['worldmap-biomes'],tr=g['worldmap-transitions'];
+  b.innerHTML=bi.entries.map(e=>`<figure class="b"><img src="../assets/${bi.base}${e.id}.png" alt="${e.label}"><figcaption>${e.label}</figcaption></figure>`).join('');
+  t.innerHTML=tr.entries.map(e=>`<figure class="t"><img src="../assets/${tr.base}${e.id}.png" alt="${e.label}"><figcaption>${e.label}</figcaption></figure>`).join('');
+});
+</script>
+</body></html>

@@ -1,0 +1,60 @@
+<!-- @dsCard group="Systems" viewport="820x520" name="Quantum field & elements" subtitle="7 exotic elements, combinations, travel sequence, phenomena & hazard levels" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>
+body{margin:0;padding:20px;background:var(--surface-page);color:var(--text-body);display:flex;flex-direction:column;gap:18px}
+.h{font-family:var(--font-display);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-section);margin-bottom:8px}
+.elems{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.flow{display:flex;gap:6px;align-items:stretch}
+.step{flex:1;border:1px solid var(--border-panel);background:var(--surface-panel);border-radius:var(--radius-1);padding:8px}
+.step b{font-family:var(--font-display);font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:var(--teal);display:block;margin-bottom:3px}
+.step span{font-size:9px;color:var(--text-faint);line-height:1.3}
+.arrow{align-self:center;color:var(--text-faint);font-size:12px}
+.phen{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.p{border:1px solid var(--border-panel);background:var(--surface-panel);border-radius:var(--radius-1);padding:8px;border-top:2px solid var(--pc)}
+.p b{font-family:var(--font-display);font-size:9px;letter-spacing:.04em;text-transform:uppercase;color:var(--pc);display:block;margin-bottom:3px}
+.p span{font-size:9px;color:var(--text-faint);line-height:1.3}
+.haz{display:flex;gap:18px;flex-wrap:wrap}
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../_ds_bundle.js"></script></head><body>
+<div><div class="h">Quantum elements</div><div class="elems" id="elems"></div></div>
+<div class="cols">
+<div><div class="h">Quantum travel</div><div class="flow">
+<div class="step"><b>1 Calibrate</b><span>Align ship to quantum frequency</span></div><span class="arrow">▸</span>
+<div class="step"><b>2 Anchor</b><span>Lock onto a stable coordinate</span></div><span class="arrow">▸</span>
+<div class="step"><b>3 Warp</b><span>Enter field, compress space-time</span></div><span class="arrow">▸</span>
+<div class="step"><b>4 Transition</b><span>Navigate quantum currents</span></div><span class="arrow">▸</span>
+<div class="step"><b>5 Arrival</b><span>Exit warp, recalibrate</span></div>
+</div></div>
+<div><div class="h">Field hazard levels</div><div class="haz" id="haz"></div></div>
+</div>
+<div><div class="h">Quantum phenomena</div><div class="phen">
+<div class="p" style="--pc:var(--quantum-purple)"><b>Quantum Storm</b><span>Chaotic currents cause system disruption</span></div>
+<div class="p" style="--pc:var(--alert-red)"><b>Rift Breach</b><span>Unstable tears in reality; entities emerge</span></div>
+<div class="p" style="--pc:var(--success-green)"><b>Time Eddy</b><span>Local time dilation or reversal</span></div>
+<div class="p" style="--pc:var(--electric-blue)"><b>Void Silence</b><span>Communication blackout; sensors fail</span></div>
+<div class="p" style="--pc:var(--atom-gold)"><b>Energy Surge</b><span>High-energy zones boost power but risk overload</span></div>
+<div class="p" style="--pc:var(--teal)"><b>Quantum Whisper</b><span>Echoes of consciousness from another parallel</span></div>
+</div></div>
+<script type="text/babel">
+const {ElementCard,HazardBadge}=window.QuantumEffectDesignSystem_2d830e;
+ReactDOM.createRoot(document.getElementById('elems')).render(<>
+ <ElementCard width="100%" name="Quantium" element="quantium" rarity="Common" source="Asteroids, Debris" usage="Systems, Components" description="Balanced and stable; used in core systems."/>
+ <ElementCard width="100%" name="Voidium" element="voidium" rarity="Uncommon" source="Quantum Storms" usage="Weapons, Shields" description="Absorbs energy from surroundings."/>
+ <ElementCard width="100%" name="Neutronite" element="neutronite" rarity="Rare" source="Neutron Stars" usage="Armor, Hulls" description="Extremely dense and highly durable."/>
+ <ElementCard width="100%" name="Singularium" element="singularium" rarity="Epic" source="Gravity Wells" usage="Engines, Modules" description="Manipulates gravity on a micro scale."/>
+ <ElementCard width="100%" name="Phasium" element="phasium" rarity="Epic" source="Rift Breaches" usage="Cloaking, Stealth" description="Phases in and out of reality."/>
+ <ElementCard width="100%" name="Entropium" element="entropium" rarity="Legendary" source="Unknown Entities" usage="Exotic Weapons" description="Increases entropy; breaks down systems."/>
+ <ElementCard width="100%" name="Aeon Crystal" element="aeon" rarity="Mythic" source="Time Eddies" usage="Time Tech, AI" description="Stores and manipulates time energy."/>
+ <div style={{border:'1px dashed var(--border-bright)',borderRadius:'var(--radius-1)',padding:'var(--sp-3)',fontSize:10,color:'var(--text-muted)',lineHeight:1.5}}><b style={{fontFamily:'var(--font-display)',fontSize:9,letterSpacing:'.1em',textTransform:'uppercase',color:'var(--text-section)',display:'block',marginBottom:4}}>Combinations</b>Quantium + Neutronite = Quantum Alloy · Voidium + Phasium = Void Cloak Matrix · Singularium + Aeon = Graviton Core · Entropium + Voidium = Chaos Reactor</div>
+</>);
+ReactDOM.createRoot(document.getElementById('haz')).render(<>
+ <HazardBadge level="safe" note="Stable and predictable"/>
+ <HazardBadge level="caution" note="Minor anomalies"/>
+ <HazardBadge level="danger" note="High energy fluctuations"/>
+ <HazardBadge level="extreme" note="Severe distortions"/>
+ <HazardBadge level="unknown" note="Uncharted"/>
+</>);
+</script></body></html>

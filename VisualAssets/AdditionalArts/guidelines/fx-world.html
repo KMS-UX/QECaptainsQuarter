@@ -1,0 +1,26 @@
+<!-- @dsCard group="FX & Animation" viewport="860x520" name="Environment, UI & atmospheric FX" subtitle="World, feedback, portal & weather effect panels + composite in-game examples" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>
+body{margin:0;padding:16px;background:var(--surface-page);color:var(--text-primary);display:flex;flex-direction:column;gap:16px}
+h4{margin:0 0 -4px;font-family:var(--font-display);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-secondary,#8aa)}
+.panels{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.p{border:1px solid var(--border-panel);border-radius:var(--radius-1);overflow:hidden;background:#05070d}
+.p h5{margin:0;padding:5px 9px;font-family:var(--font-display);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-secondary,#9ab);border-bottom:1px solid var(--border-panel)}
+.p img{width:100%;display:block}
+.comp{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.c{position:relative;border:1px solid var(--border-panel);border-radius:var(--radius-1);overflow:hidden;aspect-ratio:150/115;background:#05070d}
+.c img{width:100%;height:100%;object-fit:cover;display:block}
+.c figcaption{position:absolute;left:0;right:0;bottom:0;padding:4px 6px;background:linear-gradient(transparent,rgba(3,6,12,.94));font-family:var(--font-display);font-size:8px;letter-spacing:.05em;text-transform:uppercase;text-align:center}
+</style></head><body>
+<h4>Effect panels</h4>
+<div class="panels" id="p"></div>
+<h4>Composite in-game examples</h4>
+<div class="comp" id="c"></div>
+<script src="../assets/data/content.js"></script>
+<script>
+QEContent.loadCatalog('../assets/data').then(g=>{
+  const lib=g['fx-library'],comp=g['fx-composites'];
+  p.innerHTML=lib.entries.map(e=>`<div class="p"><h5>${e.label}</h5><img src="../assets/${lib.base}${e.id}.png" alt="${e.label}"></div>`).join('');
+  c.innerHTML=comp.entries.map(e=>`<figure class="c"><img src="../assets/${comp.base}${e.id}.png" alt="${e.label}"><figcaption>${e.label}</figcaption></figure>`).join('');
+});
+</script>
+</body></html>

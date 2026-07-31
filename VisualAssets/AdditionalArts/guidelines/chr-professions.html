@@ -1,0 +1,16 @@
+<!-- @dsCard group="Characters" viewport="860x560" name="NPC professions" subtitle="96 citizen archetypes across 12 role categories — populate towns, quests & the living world (32×32)" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>
+body{margin:0;padding:16px;background:var(--surface-page);color:var(--text-primary);display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cat{border:1px solid var(--border-panel);border-radius:var(--radius-1);overflow:hidden;background:var(--surface-inset)}
+.cat h5{margin:0;padding:5px 8px;font-family:var(--font-display);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-secondary,#9ab);border-bottom:1px solid var(--border-panel);background:rgba(255,255,255,.02)}
+.cat img{width:100%;display:block}
+</style></head><body>
+<div id="g" style="display:contents"></div>
+<script src="../assets/data/content.js"></script>
+<script>
+QEContent.loadCatalog('../assets/data').then(gg=>{
+  const s=gg['characters-professions'];
+  g.innerHTML=s.entries.map(e=>`<div class="cat"><h5>${e.label}</h5><img src="../assets/${s.base}${e.id}.png" alt="${e.label}"></div>`).join('');
+});
+</script>
+</body></html>

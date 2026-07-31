@@ -1,0 +1,52 @@
+<!-- @dsCard group="Icon Library" viewport="820x560" name="Inventory & Icon Bible" subtitle="Item taxonomy, rarity tiers, frame & badge system, stack/enhancement rules" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>
+body{margin:0;padding:18px;background:var(--surface-page);color:var(--text-body);display:flex;flex-direction:column;gap:18px}
+.h{font-family:var(--font-display);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-section);margin-bottom:8px}
+.tax{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.cat{background:var(--surface-inset);border:1px solid var(--border-panel);border-radius:var(--radius-1);padding:8px 10px}
+.cat b{font-family:var(--font-display);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-body);display:block}
+.cat span{font-size:9px;color:var(--text-faint);line-height:1.35}
+.row{display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap}
+.chip{display:flex;flex-direction:column;align-items:center;gap:5px}
+.chip small{font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-faint)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.note{font-size:11px;line-height:1.5;color:var(--text-muted)}.note li{margin-bottom:3px}
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../_ds_bundle.js"></script></head><body>
+<div><div class="h">Item taxonomy · 10 categories</div><div class="tax" id="tax"></div></div>
+<div class="cols">
+<div><div class="h">Rarity tiers</div><div class="row" id="rar"></div></div>
+<div><div class="h">Frame &amp; state badges</div><div class="row" id="badge"></div></div>
+</div>
+<div class="cols">
+<div><div class="h">Stack &amp; enhancement</div><div class="row" id="stack"></div></div>
+<div><div class="h">Rules</div><ul class="note">
+<li>Rarity color frames used consistently across every category.</li>
+<li>Icons stay legible at 32×32; category silhouette drives recognition.</li>
+<li>New items carry a gold <b>NEW</b> badge until viewed; equipped show <b>E</b>; locked show a lock.</li>
+<li>Stack count sits bottom-right; enhancement (<b>+N / MAX</b>) bottom-left in green.</li>
+</ul></div>
+</div>
+<script type="text/babel">
+const {ItemSlot,RarityTag}=window.QuantumEffectDesignSystem_2d830e;
+const B="../assets/icons/";
+const CATS=[["Weapons","swords · bows · guns · staves · orbs · fists"],["Armor","head · chest · gloves · legs · boots · capes"],["Accessories","rings · necklaces · bracelets · charms · belts"],["Consumables","healing · buffs · offensive · food · potions"],["Materials","ore · plant · essence · crystal · animal"],["Currencies","coins · gems · tokens · vouchers · energy"],["Quest items","documents · relics · markers"],["Key items","keys · cards · sigils"],["Crafting","parts · circuits · cores · lenses · blueprints"],["Miscellaneous","books · logs · artifacts · trophies · mementos"]];
+const TIERS=["common","uncommon","rare","epic","legendary","mythic","exotic"];
+ReactDOM.createRoot(document.getElementById('tax')).render(<>{CATS.map(([n,d])=><div className="cat" key={n}><b>{n}</b><span>{d}</span></div>)}</>);
+ReactDOM.createRoot(document.getElementById('rar')).render(<>{TIERS.map(t=><div className="chip" key={t}><ItemSlot rarity={t} image={B+"weapon-sword-rare.png"}/><small>{t}</small></div>)}</>);
+ReactDOM.createRoot(document.getElementById('badge')).render(<>
+ <div className="chip"><ItemSlot rarity="epic" image={B+"gem-green.png"} badge="new"/><small>New</small></div>
+ <div className="chip"><ItemSlot rarity="rare" image={B+"gem-green.png"} badge="favorite"/><small>Favorite</small></div>
+ <div className="chip"><ItemSlot rarity="legendary" image={B+"weapon-sword-legendary.png"} badge="equipped"/><small>Equipped</small></div>
+ <div className="chip"><ItemSlot rarity="common" image={B+"potion-health.png"} badge="locked"/><small>Locked</small></div>
+</>);
+ReactDOM.createRoot(document.getElementById('stack')).render(<>
+ <div className="chip"><ItemSlot rarity="epic" image={B+"crystal-essence.png"} count={3}/><small>x3</small></div>
+ <div className="chip"><ItemSlot rarity="uncommon" image={B+"gem-green.png"} count={99}/><small>x99</small></div>
+ <div className="chip"><ItemSlot rarity="legendary" image={B+"weapon-sword-legendary.png"} quality="+15"/><small>+15</small></div>
+ <div className="chip"><ItemSlot rarity="mythic" image={B+"weapon-sword-legendary.png"} quality="MAX"/><small>Max</small></div>
+</>);
+</script></body></html>

@@ -1,0 +1,545 @@
+{
+  "plugins": [
+    "react",
+    "import"
+  ],
+  "rules": {
+    "react/forbid-elements": [
+      "warn",
+      {
+        "forbid": []
+      }
+    ],
+    "no-restricted-imports": [
+      "warn",
+      {
+        "patterns": [
+          {
+            "group": [
+              "assets/data/**",
+              "components/core/**",
+              "components/dialogue/**",
+              "components/equipment/**",
+              "components/hud/**",
+              "components/inventory/**",
+              "components/quantum/**",
+              "components/quests/**",
+              "components/system/**",
+              "ui_kits/game/**"
+            ],
+            "message": "Import design-system components from 'index.js', not component internals."
+          }
+        ]
+      }
+    ],
+    "no-restricted-syntax": [
+      "warn",
+      {
+        "selector": "Literal[value=/#[0-9a-fA-F]{3,8}\\b/]",
+        "message": "Raw hex color — use a design-system color token via var()."
+      },
+      {
+        "selector": "Literal[value=/\\b\\d+px\\b/]",
+        "message": "Raw px value — use a design-system spacing token via var()."
+      },
+      {
+        "selector": "Literal[value=/font-family\\s*:\\s*(?!['\\\"]?(?:Orbitron|Share Tech Mono))/i]",
+        "message": "Font not provided by the design system. Available: Orbitron, Share Tech Mono."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute > JSXIdentifier[name!=/^(?:variant|size|disabled|onClick|children|style|key|ref|className|style|children)$/]",
+        "message": "<Button> doesn't accept that prop. Declared props: variant, size, disabled, onClick, children, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute[name.name='variant'] > Literal[value!=/^(?:primary|secondary|ghost|danger)$/]",
+        "message": "<Button> variant must be one of 'primary' | 'secondary' | 'ghost' | 'danger'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute[name.name='size'] > Literal[value!=/^(?:sm|md|lg)$/]",
+        "message": "<Button> size must be one of 'sm' | 'md' | 'lg'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='DialogueBox'] > JSXAttribute > JSXIdentifier[name!=/^(?:kind|speaker|portrait|children|actions|style|key|ref|className|style|children)$/]",
+        "message": "<DialogueBox> doesn't accept that prop. Declared props: kind, speaker, portrait, children, actions, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='DialogueBox'] > JSXAttribute[name.name='kind'] > Literal[value!=/^(?:dialogue|system|warning|confirm)$/]",
+        "message": "<DialogueBox> kind must be one of 'dialogue' | 'system' | 'warning' | 'confirm'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='ElementCard'] > JSXAttribute > JSXIdentifier[name!=/^(?:name|element|rarity|source|usage|description|width|style|key|ref|className|style|children)$/]",
+        "message": "<ElementCard> doesn't accept that prop. Declared props: name, element, rarity, source, usage, description, width, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='ElementCard'] > JSXAttribute[name.name='element'] > Literal[value!=/^(?:quantium|voidium|neutronite|singularium|phasium|entropium|aeon)$/]",
+        "message": "<ElementCard> element must be one of 'quantium' | 'voidium' | 'neutronite' | 'singularium' | 'phasium' | 'entropium' | 'aeon'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='ItemSlot'] > JSXAttribute > JSXIdentifier[name!=/^(?:rarity|icon|image|count|quality|badge|selected|size|empty|onClick|style|key|ref|className|style|children)$/]",
+        "message": "<ItemSlot> doesn't accept that prop. Declared props: rarity, icon, image, count, quality, badge, selected, size, empty, onClick, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='ItemSlot'] > JSXAttribute[name.name='rarity'] > Literal[value!=/^(?:common|uncommon|rare|epic|legendary|mythic|exotic)$/]",
+        "message": "<ItemSlot> rarity must be one of 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic' | 'exotic'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='ItemSlot'] > JSXAttribute[name.name='badge'] > Literal[value!=/^(?:new|favorite|equipped|locked)$/]",
+        "message": "<ItemSlot> badge must be one of 'new' | 'favorite' | 'equipped' | 'locked'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='LoadingScreen'] > JSXAttribute > JSXIdentifier[name!=/^(?:title|progress|status|tip|width|style|key|ref|className|style|children)$/]",
+        "message": "<LoadingScreen> doesn't accept that prop. Declared props: title, progress, status, tip, width, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='MenuList'] > JSXAttribute > JSXIdentifier[name!=/^(?:items|selected|onSelect|width|key|ref|className|style|children)$/]",
+        "message": "<MenuList> doesn't accept that prop. Declared props: items, selected, onSelect, width."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='MinimapBlip'] > JSXAttribute > JSXIdentifier[name!=/^(?:kind|x|y|key|ref|className|style|children)$/]",
+        "message": "<MinimapBlip> doesn't accept that prop. Declared props: kind, x, y."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='MinimapBlip'] > JSXAttribute[name.name='kind'] > Literal[value!=/^(?:player|ally|enemy|objective|poi)$/]",
+        "message": "<MinimapBlip> kind must be one of 'player' | 'ally' | 'enemy' | 'objective' | 'poi'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Notification'] > JSXAttribute > JSXIdentifier[name!=/^(?:items|style|key|ref|className|style|children)$/]",
+        "message": "<Notification> doesn't accept that prop. Declared props: items, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Objective'] > JSXAttribute > JSXIdentifier[name!=/^(?:text|done|count|key|ref|className|style|children)$/]",
+        "message": "<Objective> doesn't accept that prop. Declared props: text, done, count."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Panel'] > JSXAttribute > JSXIdentifier[name!=/^(?:title|accent|corners|children|style|key|ref|className|style|children)$/]",
+        "message": "<Panel> doesn't accept that prop. Declared props: title, accent, corners, children, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='QuestCard'] > JSXAttribute > JSXIdentifier[name!=/^(?:tier|title|description|objective|progress|progressMax|level|image|footer|width|style|key|ref|className|style|children)$/]",
+        "message": "<QuestCard> doesn't accept that prop. Declared props: tier, title, description, objective, progress, progressMax, level, image, footer, width, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='QuestCard'] > JSXAttribute[name.name='tier'] > Literal[value!=/^(?:main|side|faction|world|daily|hidden)$/]",
+        "message": "<QuestCard> tier must be one of 'main' | 'side' | 'faction' | 'world' | 'daily' | 'hidden'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='RewardItem'] > JSXAttribute > JSXIdentifier[name!=/^(?:name|rarity|image|key|ref|className|style|children)$/]",
+        "message": "<RewardItem> doesn't accept that prop. Declared props: name, rarity, image."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='RewardItem'] > JSXAttribute[name.name='rarity'] > Literal[value!=/^(?:common|uncommon|rare|epic|legendary|mythic|exotic)$/]",
+        "message": "<RewardItem> rarity must be one of 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic' | 'exotic'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='TrackedQuest'] > JSXAttribute > JSXIdentifier[name!=/^(?:tier|title|sub|timer|active|key|ref|className|style|children)$/]",
+        "message": "<TrackedQuest> doesn't accept that prop. Declared props: tier, title, sub, timer, active."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='TrackedQuest'] > JSXAttribute[name.name='tier'] > Literal[value!=/^(?:main|side|faction|world|daily|hidden)$/]",
+        "message": "<TrackedQuest> tier must be one of 'main' | 'side' | 'faction' | 'world' | 'daily' | 'hidden'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='StatBar'] > JSXAttribute > JSXIdentifier[name!=/^(?:kind|value|max|label|showValue|height|style|key|ref|className|style|children)$/]",
+        "message": "<StatBar> doesn't accept that prop. Declared props: kind, value, max, label, showValue, height, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='StatBar'] > JSXAttribute[name.name='kind'] > Literal[value!=/^(?:hp|ep|xp|boss)$/]",
+        "message": "<StatBar> kind must be one of 'hp' | 'ep' | 'xp' | 'boss'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='StatMeter'] > JSXAttribute > JSXIdentifier[name!=/^(?:label|value|color|showValue|width|style|key|ref|className|style|children)$/]",
+        "message": "<StatMeter> doesn't accept that prop. Declared props: label, value, color, showValue, width, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Tabs'] > JSXAttribute > JSXIdentifier[name!=/^(?:tabs|active|onChange|key|ref|className|style|children)$/]",
+        "message": "<Tabs> doesn't accept that prop. Declared props: tabs, active, onChange."
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/index.js"
+      ],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
+  ],
+  "x-omelette": {
+    "components": {
+      "Button": {
+        "replaces": []
+      },
+      "DialogueBox": {
+        "replaces": []
+      },
+      "ElementCard": {
+        "replaces": []
+      },
+      "ItemSlot": {
+        "replaces": []
+      },
+      "LoadingScreen": {
+        "replaces": []
+      },
+      "MenuList": {
+        "replaces": []
+      },
+      "MinimapBlip": {
+        "replaces": []
+      },
+      "Notification": {
+        "replaces": []
+      },
+      "Objective": {
+        "replaces": []
+      },
+      "Panel": {
+        "replaces": []
+      },
+      "QuestCard": {
+        "replaces": []
+      },
+      "RewardItem": {
+        "replaces": []
+      },
+      "TrackedQuest": {
+        "replaces": []
+      },
+      "StatBar": {
+        "replaces": []
+      },
+      "StatMeter": {
+        "replaces": []
+      },
+      "Tabs": {
+        "replaces": []
+      }
+    },
+    "tokens": [
+      "--alert-red",
+      "--alert-red-deep",
+      "--amb-anomaly-accent",
+      "--amb-anomaly-base",
+      "--amb-anomaly-mid",
+      "--amb-arctic-accent",
+      "--amb-arctic-base",
+      "--amb-arctic-mid",
+      "--amb-desert-accent",
+      "--amb-desert-base",
+      "--amb-desert-mid",
+      "--amb-neon-night-accent",
+      "--amb-neon-night-base",
+      "--amb-neon-night-mid",
+      "--amb-overgrown-accent",
+      "--amb-overgrown-base",
+      "--amb-overgrown-mid",
+      "--amb-space-accent",
+      "--amb-space-base",
+      "--amb-space-mid",
+      "--amb-toxic-accent",
+      "--amb-toxic-base",
+      "--amb-toxic-mid",
+      "--amb-void-accent",
+      "--amb-void-base",
+      "--amb-void-mid",
+      "--atom-gold",
+      "--atom-gold-deep",
+      "--bar-ep",
+      "--bar-ep-hi",
+      "--bar-hp",
+      "--bar-hp-hi",
+      "--bar-track",
+      "--bar-xp",
+      "--bar-xp-hi",
+      "--border-accent",
+      "--border-bright",
+      "--border-panel",
+      "--card-pad",
+      "--dur-base",
+      "--dur-fast",
+      "--dur-instant",
+      "--dur-slow",
+      "--dur-slower",
+      "--ease-emphasized",
+      "--ease-in",
+      "--ease-linear",
+      "--ease-out",
+      "--ease-ui",
+      "--electric-blue",
+      "--electric-blue-deep",
+      "--elem-aeon",
+      "--elem-entropium",
+      "--elem-neutronite",
+      "--elem-phasium",
+      "--elem-quantium",
+      "--elem-singularium",
+      "--elem-voidium",
+      "--ember-orange",
+      "--faction-aurelian",
+      "--faction-curators",
+      "--faction-eclipse",
+      "--faction-emberpact",
+      "--faction-exile",
+      "--faction-horizon",
+      "--faction-ironward",
+      "--faction-synthic",
+      "--faction-voidseekers",
+      "--fg-1",
+      "--fg-2",
+      "--fg-3",
+      "--fg-disabled",
+      "--focus-ring",
+      "--font-display",
+      "--font-ui",
+      "--glow-gold",
+      "--glow-purple",
+      "--glow-red",
+      "--glow-teal",
+      "--hazard-caution",
+      "--hazard-danger",
+      "--hazard-extreme",
+      "--hazard-safe",
+      "--hazard-unknown",
+      "--hit-target",
+      "--inset-panel",
+      "--leading-body",
+      "--leading-tight",
+      "--map-fog",
+      "--map-terrain",
+      "--map-terrain-hi",
+      "--marker-ally",
+      "--marker-enemy",
+      "--marker-objective",
+      "--marker-player",
+      "--marker-poi",
+      "--overlay-dim",
+      "--panel-gradient",
+      "--panel-pad",
+      "--quantum-purple",
+      "--quantum-purple-deep",
+      "--quantum-purple-dim",
+      "--quest-daily",
+      "--quest-faction",
+      "--quest-hidden",
+      "--quest-main",
+      "--quest-side",
+      "--quest-world",
+      "--radius-0",
+      "--radius-1",
+      "--radius-2",
+      "--radius-3",
+      "--rarity-common",
+      "--rarity-epic",
+      "--rarity-exotic",
+      "--rarity-legendary",
+      "--rarity-mythic",
+      "--rarity-rare",
+      "--rarity-uncommon",
+      "--scanline",
+      "--shadow-panel",
+      "--slot-size",
+      "--slot-size-sm",
+      "--sp-1",
+      "--sp-2",
+      "--sp-3",
+      "--sp-4",
+      "--sp-5",
+      "--sp-6",
+      "--sp-7",
+      "--success-green",
+      "--success-green-deep",
+      "--surface-inset",
+      "--surface-page",
+      "--surface-panel",
+      "--surface-raised",
+      "--teal",
+      "--teal-deep",
+      "--text-body",
+      "--text-brand",
+      "--text-faint",
+      "--text-heading",
+      "--text-hero",
+      "--text-label",
+      "--text-micro",
+      "--text-muted",
+      "--text-section",
+      "--text-small",
+      "--text-title",
+      "--tracking-caps",
+      "--tracking-wide",
+      "--void-0",
+      "--void-1",
+      "--void-2",
+      "--void-3",
+      "--void-4",
+      "--weight-display-black",
+      "--weight-display-bold"
+    ],
+    "tokenKinds": {
+      "--void-0": "color",
+      "--void-1": "color",
+      "--void-2": "color",
+      "--void-3": "color",
+      "--void-4": "color",
+      "--fg-1": "color",
+      "--fg-2": "color",
+      "--fg-3": "color",
+      "--fg-disabled": "color",
+      "--quantum-purple": "color",
+      "--quantum-purple-deep": "color",
+      "--quantum-purple-dim": "color",
+      "--teal": "color",
+      "--teal-deep": "color",
+      "--electric-blue": "color",
+      "--electric-blue-deep": "color",
+      "--atom-gold": "color",
+      "--atom-gold-deep": "color",
+      "--alert-red": "color",
+      "--alert-red-deep": "color",
+      "--success-green": "color",
+      "--success-green-deep": "color",
+      "--ember-orange": "color",
+      "--surface-page": "color",
+      "--surface-panel": "color",
+      "--surface-raised": "color",
+      "--surface-inset": "color",
+      "--text-body": "font",
+      "--text-muted": "font",
+      "--text-faint": "font",
+      "--text-heading": "font",
+      "--text-section": "font",
+      "--text-brand": "font",
+      "--border-panel": "color",
+      "--border-bright": "color",
+      "--border-accent": "color",
+      "--focus-ring": "color",
+      "--bar-hp": "color",
+      "--bar-hp-hi": "color",
+      "--bar-ep": "color",
+      "--bar-ep-hi": "color",
+      "--bar-xp": "color",
+      "--bar-xp-hi": "color",
+      "--bar-track": "color",
+      "--rarity-common": "color",
+      "--rarity-uncommon": "color",
+      "--rarity-rare": "color",
+      "--rarity-epic": "color",
+      "--rarity-legendary": "color",
+      "--rarity-mythic": "color",
+      "--rarity-exotic": "color",
+      "--quest-main": "color",
+      "--quest-side": "color",
+      "--quest-faction": "color",
+      "--quest-world": "color",
+      "--quest-daily": "color",
+      "--quest-hidden": "color",
+      "--elem-quantium": "color",
+      "--elem-voidium": "color",
+      "--elem-neutronite": "color",
+      "--elem-singularium": "color",
+      "--elem-phasium": "color",
+      "--elem-entropium": "color",
+      "--elem-aeon": "color",
+      "--hazard-safe": "color",
+      "--hazard-caution": "color",
+      "--hazard-danger": "color",
+      "--hazard-extreme": "color",
+      "--hazard-unknown": "color",
+      "--marker-player": "color",
+      "--marker-ally": "color",
+      "--marker-enemy": "color",
+      "--marker-objective": "color",
+      "--marker-poi": "color",
+      "--map-fog": "color",
+      "--map-terrain": "color",
+      "--map-terrain-hi": "color",
+      "--faction-aurelian": "color",
+      "--faction-emberpact": "color",
+      "--faction-voidseekers": "color",
+      "--faction-ironward": "color",
+      "--faction-eclipse": "color",
+      "--faction-horizon": "color",
+      "--faction-curators": "color",
+      "--faction-exile": "color",
+      "--faction-synthic": "color",
+      "--font-display": "font",
+      "--font-ui": "font",
+      "--text-hero": "font",
+      "--text-title": "font",
+      "--text-label": "font",
+      "--text-small": "font",
+      "--text-micro": "font",
+      "--tracking-caps": "font",
+      "--tracking-wide": "font",
+      "--leading-tight": "font",
+      "--leading-body": "font",
+      "--weight-display-bold": "font",
+      "--weight-display-black": "font",
+      "--sp-1": "spacing",
+      "--sp-2": "spacing",
+      "--sp-3": "spacing",
+      "--sp-4": "spacing",
+      "--sp-5": "spacing",
+      "--sp-6": "spacing",
+      "--sp-7": "spacing",
+      "--radius-0": "radius",
+      "--radius-1": "radius",
+      "--radius-2": "radius",
+      "--radius-3": "radius",
+      "--panel-pad": "spacing",
+      "--card-pad": "spacing",
+      "--hit-target": "spacing",
+      "--slot-size": "spacing",
+      "--slot-size-sm": "spacing",
+      "--glow-purple": "shadow",
+      "--glow-teal": "shadow",
+      "--glow-gold": "shadow",
+      "--glow-red": "shadow",
+      "--shadow-panel": "shadow",
+      "--inset-panel": "spacing",
+      "--scanline": "other",
+      "--panel-gradient": "other",
+      "--ease-ui": "other",
+      "--dur-fast": "other",
+      "--dur-base": "other",
+      "--dur-instant": "other",
+      "--dur-slow": "other",
+      "--dur-slower": "other",
+      "--ease-out": "other",
+      "--ease-in": "other",
+      "--ease-emphasized": "other",
+      "--ease-linear": "other",
+      "--overlay-dim": "color",
+      "--amb-neon-night-base": "color",
+      "--amb-neon-night-mid": "color",
+      "--amb-neon-night-accent": "color",
+      "--amb-toxic-base": "color",
+      "--amb-toxic-mid": "color",
+      "--amb-toxic-accent": "color",
+      "--amb-desert-base": "color",
+      "--amb-desert-mid": "color",
+      "--amb-desert-accent": "color",
+      "--amb-arctic-base": "color",
+      "--amb-arctic-mid": "color",
+      "--amb-arctic-accent": "color",
+      "--amb-void-base": "color",
+      "--amb-void-mid": "color",
+      "--amb-void-accent": "color",
+      "--amb-overgrown-base": "color",
+      "--amb-overgrown-mid": "color",
+      "--amb-overgrown-accent": "color",
+      "--amb-space-base": "spacing",
+      "--amb-space-mid": "spacing",
+      "--amb-space-accent": "spacing",
+      "--amb-anomaly-base": "color",
+      "--amb-anomaly-mid": "color",
+      "--amb-anomaly-accent": "color"
+    },
+    "fontFamilies": [
+      "Orbitron",
+      "Share Tech Mono"
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+<!-- @dsCard group="Icons" viewport="700x180" name="Skills, elements & factions" subtitle="Ability glyphs, damage types, faction emblems — data-driven from assets/data/catalog.json" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>body{margin:0;padding:14px;background:var(--surface-page);display:flex;flex-direction:column;gap:12px}.grp{display:flex;flex-direction:column;gap:6px}.h{font-family:var(--font-display);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-section)}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.s{width:44px;height:44px;background:var(--surface-inset);border:1px solid var(--border-panel);border-radius:var(--radius-1);display:flex;align-items:center;justify-content:center}.s img{width:100%;height:100%;image-rendering:pixelated}.fac{width:52px;height:52px;display:flex;flex-direction:column;align-items:center}.fac img{width:44px;height:44px;image-rendering:pixelated}</style></head><body>
+<div id="g"></div>
+<script src="../assets/data/content.js"></script>
+<script>
+QEContent.loadCatalog('../assets/data').then(gal=>{
+  const grp=(key,cls)=>{const s=gal[key];return `<div class="grp"><div class="h">${s.label}</div><div class="row">${s.entries.map(e=>`<div class="${cls}"><img src="../assets/${s.base}${e.id}.png" title="${e.label}" alt="${e.label}"></div>`).join('')}</div></div>`;};
+  g.innerHTML=grp('icons-skills','s')+grp('icons-elements','s')+grp('icons-factions','fac');
+});
+</script>
+</body></html>

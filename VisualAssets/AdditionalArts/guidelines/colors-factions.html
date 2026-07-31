@@ -1,0 +1,10 @@
+<!-- @dsCard group="Colors" viewport="700x130" name="Faction colors" subtitle="Four powers — data-driven from assets/data/factions.json" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>body{margin:0;padding:14px;background:var(--surface-page);display:flex;gap:8px}.s{flex:1;border:1px solid var(--border-panel);background:var(--surface-panel);padding:10px;display:flex;flex-direction:column;gap:6px}.n{font-family:var(--font-display);font-size:10px;letter-spacing:.1em}.m{font-size:9px;color:var(--text-faint)}.bar{height:22px}</style></head><body>
+<div id="g" style="display:flex;gap:8px;flex:1"></div>
+<script src="../assets/data/content.js"></script>
+<script>
+QEContent.load('../assets/data').then(({factions})=>{
+  g.innerHTML=factions.map(f=>`<div class="s"><div class="bar" style="background:var(${f.colorToken})"></div><div class="n" style="color:var(${f.colorToken})">${f.name.toUpperCase()}</div><div class="m">"${f.motto}"</div></div>`).join('');
+});
+</script>
+</body></html>

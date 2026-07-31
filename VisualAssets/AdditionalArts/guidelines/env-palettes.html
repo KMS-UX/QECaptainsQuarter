@@ -1,0 +1,22 @@
+<!-- @dsCard group="Environments" viewport="820x260" name="Ambience palettes" subtitle="8 biome moods sampled to tokens — base / mid / accent for lighting & overlays" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>
+body{margin:0;padding:16px;background:var(--surface-page);color:var(--text-primary)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.pal{border:1px solid var(--border-panel);border-radius:var(--radius-1);overflow:hidden}
+.sw{display:flex;height:52px}
+.sw div{flex:1}
+.meta{padding:7px 9px;background:var(--surface-panel)}
+.n{font-family:var(--font-display);font-size:9.5px;letter-spacing:.07em;text-transform:uppercase}
+.tok{font-family:var(--font-ui);font-size:7px;color:var(--text-faint);letter-spacing:.02em;margin-top:2px}
+</style></head><body>
+<div class="grid" id="g"></div>
+<script>
+const P=[
+ ['Neon Night','neon-night','#521e91'],['Toxic Industrial','toxic','#667d2c'],['Desert Sunset','desert','#9f6333'],['Arctic Blizzard','arctic','#476a7d'],
+ ['Void Corruption','void','#61269c'],['Overgrown Ruins','overgrown','#475928'],['Space Cold','space','#233f6b'],['Quantum Anomaly','anomaly','#b031b5']
+];
+document.getElementById('g').innerHTML=P.map(([n,k,ac])=>`
+<div class="pal"><div class="sw"><div style="background:var(--amb-${k}-base)"></div><div style="background:var(--amb-${k}-mid)"></div><div style="background:var(--amb-${k}-accent)"></div></div>
+<div class="meta"><div class="n" style="color:${ac}">${n}</div><div class="tok">--amb-${k}-base / -mid / -accent</div></div></div>`).join('');
+</script>
+</body></html>

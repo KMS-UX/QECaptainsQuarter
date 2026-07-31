@@ -1,0 +1,48 @@
+<!-- @dsCard group="Guidelines" viewport="820x560" name="Localization" subtitle="assets/data/strings.json — UI copy externalized to keys so templates never hard-code text" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>
+body{margin:0;padding:22px;background:var(--surface-page);color:var(--fg-1);font-family:var(--font-ui)}
+h1{font-family:var(--font-display);font-size:18px;letter-spacing:.08em;text-transform:uppercase;margin:0 0 4px}
+.sub{color:var(--text-muted);font-size:12px;margin-bottom:18px}
+.h{font-family:var(--font-display);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-section);margin:16px 0 8px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+td,th{text-align:left;padding:5px 10px;border-bottom:1px solid var(--border-panel)}
+th{font-family:var(--font-display);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-faint)}
+code{font-family:var(--font-mono,monospace);font-size:11px;color:var(--teal)}
+.n{color:var(--text-muted)}
+.jp{color:var(--fg-1)}
+pre{background:var(--surface-inset);border:1px solid var(--border-panel);border-radius:var(--radius-1);padding:12px;font-family:var(--font-mono,monospace);font-size:11px;line-height:1.55;color:var(--fg-1);margin:0;overflow:auto}
+.cols{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:start}
+</style></head><body>
+<h1>Localization</h1>
+<div class="sub">All player-facing UI copy lives in <code>strings.json</code> under dotted keys. Templates call <code>t('menu.new_game')</code> instead of writing text inline. A sibling <code>strings.&lt;locale&gt;.json</code> overrides per language; any missing key falls back to English.</div>
+
+<div class="cols">
+<div>
+<div class="h">Sample keys</div>
+<table>
+<tr><th>Key</th><th>en</th><th>ja</th></tr>
+<tr><td><code>menu.new_game</code></td><td class="n">New Game</td><td class="jp">ニューゲーム</td></tr>
+<tr><td><code>menu.continue</code></td><td class="n">Continue</td><td class="jp">つづきから</td></tr>
+<tr><td><code>common.back</code></td><td class="n">Back</td><td class="jp">戻る</td></tr>
+<tr><td><code>common.confirm</code></td><td class="n">Confirm</td><td class="jp">決定</td></tr>
+<tr><td><code>hud.objective</code></td><td class="n">Current Objective</td><td class="jp">現在の目標</td></tr>
+<tr><td><code>shop.buy</code></td><td class="n">Buy</td><td class="jp">購入</td></tr>
+<tr><td><code>death.title</code></td><td class="n">You Have Fallen</td><td class="jp">あなたは倒れた</td></tr>
+<tr><td><code>pause.resume</code></td><td class="n">Resume Game</td><td class="jp">ゲームを再開</td></tr>
+</table>
+<div class="sub" style="margin-top:10px">Namespaces: <code>menu · common · hud · inventory · quest · shop · craft · map · dialogue · save · death · pause · skill</code>.</div>
+</div>
+<div>
+<div class="h">Consume it</div>
+<pre>const L = await QEContent.loadStrings(
+  '../assets/data', 'ja');   // 'en' default
+L.t('menu.new_game')  // ニューゲーム
+L.t('shop.buyback')   // falls back to
+                      // English (not in ja)
+L.t('x.missing', '—') // fallback arg
+</pre>
+<div class="h">Rules</div>
+<div class="sub" style="line-height:1.6">Never concatenate sentences from fragments — full strings per key. Leave room: some locales run 30–40% longer, so size UI to the string, not the reverse. Keep keys stable; translators key off them.</div>
+</div>
+</div>
+</body></html>

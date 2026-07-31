@@ -1,0 +1,42 @@
+<!-- @dsCard group="Brand" viewport="820x520" name="Art direction principles" subtitle="2.5D pixel-art style, accent semantics, do's & don'ts, technical guide" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>
+body{margin:0;padding:20px;background:var(--surface-page);color:var(--text-body);display:flex;flex-direction:column;gap:18px}
+.h{font-family:var(--font-display);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-section);margin-bottom:8px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px}
+li{font-size:12px;line-height:1.4;color:var(--text-muted);padding-left:16px;position:relative}
+li::before{content:'▸';position:absolute;left:0;color:var(--teal)}
+.do li::before{content:'✔';color:var(--success-green)}
+.dont li::before{content:'✕';color:var(--alert-red)}
+.accents{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.a{border:1px solid var(--border-panel);border-radius:var(--radius-1);overflow:hidden}
+.a .sw{height:26px;background:var(--c)}
+.a .t{padding:6px 8px}.a b{font-family:var(--font-display);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--c);display:block}
+.a span{font-size:10px;color:var(--text-faint);line-height:1.3}
+.tech{display:flex;gap:24px;flex-wrap:wrap;font-size:12px;color:var(--text-muted)}
+.tech b{color:var(--fg-1);font-family:var(--font-ui)}
+.refs{font-size:11px;color:var(--text-faint);letter-spacing:.02em}
+</style></head><body>
+<div><div class="h">Art style — 2.5D pixel art</div>
+<ul><li>Hand-crafted, high contrast and clarity; consistent silhouette readability.</li>
+<li>Detailed environments with layered depth; dynamic lighting and atmospheric effects.</li></ul>
+<div class="refs" style="margin-top:8px">Key references: Chrono Trigger (1995) · Metal Slug 2 (1998) · Octopath Traveler (2018) · Dead Cells (2018)</div></div>
+<div><div class="h">Accent usage</div><div class="accents">
+<div class="a" style="--c:var(--teal)"><div class="sw"></div><div class="t"><b>Teal</b><span>Technology, UI highlights</span></div></div>
+<div class="a" style="--c:var(--quantum-purple)"><div class="sw"></div><div class="t"><b>Purple</b><span>Quantum energy, mystery</span></div></div>
+<div class="a" style="--c:var(--atom-gold)"><div class="sw"></div><div class="t"><b>Gold</b><span>Premium, important elements</span></div></div>
+<div class="a" style="--c:var(--ember-orange)"><div class="sw"></div><div class="t"><b>Orange</b><span>Danger, heat, alerts</span></div></div>
+<div class="a" style="--c:var(--success-green)"><div class="sw"></div><div class="t"><b>Green</b><span>Nature, life, healing</span></div></div>
+</div></div>
+<div class="cols">
+<div><div class="h">Do</div><ul class="do"><li>Keep silhouettes clear.</li><li>Use a consistent palette.</li><li>Maintain contrast &amp; show lighting direction.</li><li>Support readability at every size.</li></ul></div>
+<div><div class="h">Don't</div><ul class="dont"><li>Overcrowd the screen.</li><li>Use muddy colors.</li><li>Break style consistency.</li><li>Ignore light, depth, or icon clarity.</li></ul></div>
+</div>
+<div><div class="h">Technical guide</div><div class="tech">
+<span>Base resolution <b>1920×1080 (16:9)</b></span>
+<span>Sprite sizes <b>16 · 32 · 64 · 128 px</b></span>
+<span>Sprites <b>PNG (32-bit)</b></span>
+<span>UI <b>PNG / SVG</b></span>
+<span>Cinematics <b>MP4 / WebM</b></span>
+</div></div>
+</body></html>

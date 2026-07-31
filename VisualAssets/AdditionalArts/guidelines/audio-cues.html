@@ -1,0 +1,62 @@
+<!-- @dsCard group="Guidelines" viewport="800x580" name="Audio cues" subtitle="assets/data/audio.json — UI events mapped to sound-cue names the engine plays" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>
+body{margin:0;padding:22px;background:var(--surface-page);color:var(--fg-1);font-family:var(--font-ui)}
+h1{font-family:var(--font-display);font-size:18px;letter-spacing:.08em;text-transform:uppercase;margin:0 0 4px}
+.sub{color:var(--text-muted);font-size:12px;margin-bottom:18px}
+.h{font-family:var(--font-display);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-section);margin:16px 0 8px;display:flex;align-items:center;gap:8px}
+.dot{width:8px;height:8px;border-radius:50%}
+table{width:100%;border-collapse:collapse;font-size:12px}
+td,th{text-align:left;padding:5px 10px;border-bottom:1px solid var(--border-panel)}
+th{font-family:var(--font-display);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-faint)}
+code{font-family:var(--font-mono,monospace);font-size:11px;color:var(--teal)}
+.n{color:var(--text-muted)}
+pre{background:var(--surface-inset);border:1px solid var(--border-panel);border-radius:var(--radius-1);padding:12px;font-family:var(--font-mono,monospace);font-size:11px;line-height:1.55;color:var(--fg-1);margin:0}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+</style></head><body>
+<h1>Audio cues</h1>
+<div class="sub">UI code never names a sound file — it fires an <em>event</em>, and <code>audio.json</code> routes it to a cue. Designers re-point files without touching UI code; the engine and DS agree on the same event names.</div>
+
+<div class="cols">
+<div>
+<div class="h"><span class="dot" style="background:var(--teal)"></span>Interface · <code>ui.*</code></div>
+<table>
+<tr><th>Event</th><th>When</th></tr>
+<tr><td><code>ui.select</code></td><td class="n">Cursor / highlight move</td></tr>
+<tr><td><code>ui.confirm</code></td><td class="n">Primary action</td></tr>
+<tr><td><code>ui.back</code></td><td class="n">Cancel / return</td></tr>
+<tr><td><code>ui.error</code></td><td class="n">Invalid / no funds</td></tr>
+<tr><td><code>ui.tab_switch</code></td><td class="n">Change tab</td></tr>
+<tr><td><code>ui.toggle</code></td><td class="n">Setting flip</td></tr>
+<tr><td><code>ui.open</code> / <code>ui.close</code></td><td class="n">Menu open / close</td></tr>
+</table>
+<div class="h"><span class="dot" style="background:var(--atom-gold)"></span>Rewards · <code>reward.*</code></div>
+<table>
+<tr><td><code>reward.loot</code></td><td class="n">Item pickup</td></tr>
+<tr><td><code>reward.coin</code></td><td class="n">Credits / purchase</td></tr>
+<tr><td><code>reward.levelup</code></td><td class="n">Level / skill point</td></tr>
+<tr><td><code>reward.quest</code></td><td class="n">Quest updated</td></tr>
+</table>
+</div>
+<div>
+<div class="h"><span class="dot" style="background:var(--hazard-extreme)"></span>Combat · <code>combat.*</code></div>
+<table>
+<tr><th>Event</th><th>When</th></tr>
+<tr><td><code>combat.hit</code></td><td class="n">Hit connect</td></tr>
+<tr><td><code>combat.crit</code></td><td class="n">Critical hit</td></tr>
+<tr><td><code>combat.ability</code></td><td class="n">Skill cast</td></tr>
+<tr><td><code>combat.death</code></td><td class="n">You have fallen</td></tr>
+</table>
+<div class="h"><span class="dot" style="background:var(--quantum-purple)"></span>World & system · <code>world.*</code></div>
+<table>
+<tr><td><code>world.save</code></td><td class="n">Game saved / auto-save</td></tr>
+<tr><td><code>world.fast_travel</code></td><td class="n">Fast-travel warp</td></tr>
+<tr><td><code>world.dialogue</code></td><td class="n">Advance dialogue</td></tr>
+</table>
+</div>
+</div>
+
+<div class="h">Consume it</div>
+<pre>const A = await QEContent.loadAudio('../assets/data');
+button.onclick = () =&gt; { play(A.cue('ui.confirm')); /* -&gt; 'sfx/ui/confirm.wav' */ };
+// each cue: { category, file, desc, loop }. Add cues in audio.json, never hard-code paths.</pre>
+</body></html>

@@ -1,0 +1,18 @@
+<!-- @dsCard group="FX & Animation" viewport="860x560" name="FX & animation reference sheets" subtitle="Full annotated bibles — FX/VFX library, combat effects, skill effect library & animation keyframe reference" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>
+body{margin:0;padding:16px;background:var(--surface-page);color:var(--text-primary);display:flex;flex-direction:column;gap:14px}
+p{margin:0;font-size:11px;line-height:1.5;color:var(--text-secondary,#8aa)}
+figure{margin:0;position:relative;border:1px solid var(--border-panel);border-radius:var(--radius-1);overflow:hidden;background:#05070d}
+figure img{width:100%;display:block}
+figcaption{position:absolute;top:8px;left:8px;padding:3px 9px;background:rgba(3,6,12,.74);border:1px solid var(--border-panel);border-radius:var(--radius-1);font-family:var(--font-display);font-size:9px;letter-spacing:.1em;text-transform:uppercase}
+</style></head><body>
+<p>Full annotated production bibles — reference for the FX visual language (blending modes, quality tiers, performance), combat & skill effect vocabularies (elemental combos, modular parts, layering), and animation keyframes (timing guide, squash & stretch, frame rates).</p>
+<div id="g" style="display:flex;flex-direction:column;gap:14px"></div>
+<script src="../assets/data/content.js"></script>
+<script>
+QEContent.loadCatalog('../assets/data').then(gg=>{
+  const s=gg['fx-sheets'];
+  g.innerHTML=s.entries.map(e=>`<figure><img src="../assets/${s.base}${e.id}.png" alt="${e.label}"><figcaption>${e.label}</figcaption></figure>`).join('');
+});
+</script>
+</body></html>

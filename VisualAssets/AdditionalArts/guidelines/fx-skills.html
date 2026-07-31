@@ -1,0 +1,18 @@
+<!-- @dsCard group="FX & Animation" viewport="860x560" name="Skill effect library" subtitle="9 skill families by gameplay role + one skill in 7 elemental variations — layered, color-tintable" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>
+body{margin:0;padding:16px;background:var(--surface-page);color:var(--text-primary);display:flex;flex-direction:column;gap:10px}
+.s{border:1px solid var(--border-panel);border-radius:var(--radius-1);overflow:hidden;background:#05070d}
+.s h5{margin:0;padding:5px 9px;font-family:var(--font-display);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-secondary,#9ab);border-bottom:1px solid var(--border-panel)}
+.s img{width:100%;display:block}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+</style></head><body>
+<div id="full" style="display:flex;flex-direction:column;gap:10px"></div>
+<div class="two" id="half"></div>
+<script>
+const B='../assets/fx/skills/';
+const F=[['damage','Damage'],['aoe','Area damage (AoE)'],['buff','Buff / enhance'],['debuff','Debuff / weaken'],['control','Control / crowd'],['movement','Movement / mobility']];
+full.innerHTML=F.map(([f,n])=>`<div class="s"><h5>${n}</h5><img src="${B}${f}.png" alt="${n}"></div>`).join('');
+const H=[['summon','Summon / conjure'],['heal','Heal / restore'],['utility','Utility / other'],['elemental-variation','One skill · 7 elements']];
+half.innerHTML=H.map(([f,n])=>`<div class="s"><h5>${n}</h5><img src="${B}${f}.png" alt="${n}"></div>`).join('');
+</script>
+</body></html>

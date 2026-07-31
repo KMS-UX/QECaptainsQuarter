@@ -1,0 +1,63 @@
+<!-- @dsCard group="Guidelines" viewport="880x560" name="Component states" subtitle="Default / hover / press / focus / disabled recipes per interactive component — for engine parity" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>
+body{margin:0;padding:22px;background:var(--surface-page);color:var(--fg-1);font-family:var(--font-ui)}
+h1{font-family:var(--font-display);font-size:18px;letter-spacing:.08em;text-transform:uppercase;margin:0 0 4px}
+.sub{color:var(--text-muted);font-size:12px;margin-bottom:18px}
+.grid{display:grid;grid-template-columns:120px repeat(5,1fr);gap:10px;align-items:center}
+.ch{font-family:var(--font-display);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-faint);text-align:center}
+.rl{font-family:var(--font-display);font-size:11px;color:var(--fg-1)}
+.cell{display:flex;align-items:center;justify-content:center;min-height:56px}
+/* Button */
+.btn{font-family:var(--font-display);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:9px 16px;background:var(--surface-raised);border:1px solid var(--teal);color:var(--teal)}
+.btn.hov{box-shadow:var(--glow-teal);border-color:var(--border-bright)}
+.btn.prs{background:var(--teal);color:var(--void-0);border-color:var(--teal);transform:translateY(1px)}
+.btn.foc{outline:2px solid var(--focus-ring);outline-offset:2px}
+.btn.dis{background:var(--surface-inset);border-color:var(--border-panel);color:var(--fg-disabled);opacity:.6}
+/* Tab */
+.tab{font-family:var(--font-display);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);padding-bottom:6px;border-bottom:2px solid transparent}
+.tab.hov{color:var(--teal)}
+.tab.prs{color:var(--fg-1);border-bottom-color:var(--atom-gold)}
+.tab.foc{outline:2px solid var(--focus-ring);outline-offset:3px}
+.tab.dis{color:var(--fg-disabled)}
+/* Slot */
+.slot{width:46px;height:46px;background:var(--void-2);border:1px solid var(--border-panel);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--text-faint)}
+.slot.hov{border-color:var(--teal);box-shadow:var(--glow-teal)}
+.slot.prs{border:2px solid var(--atom-gold);box-shadow:var(--glow-gold)}
+.slot.foc{outline:2px solid var(--focus-ring);outline-offset:2px}
+.slot.dis{opacity:.45}
+.note{font-size:11px;color:var(--text-muted);line-height:1.6;margin-top:18px;border-top:1px solid var(--border-panel);padding-top:12px}
+code{font-family:var(--font-mono,monospace);font-size:11px;color:var(--teal)}
+</style></head><body>
+<h1>Component states</h1>
+<div class="sub">One consistent recipe per interaction state, built only from tokens — so the shipped engine reproduces the DS exactly. Row = component, column = state.</div>
+
+<div class="grid">
+  <div></div>
+  <div class="ch">Default</div><div class="ch">Hover</div><div class="ch">Press / Active</div><div class="ch">Focus</div><div class="ch">Disabled</div>
+
+  <div class="rl">Button</div>
+  <div class="cell"><span class="btn">Play</span></div>
+  <div class="cell"><span class="btn hov">Play</span></div>
+  <div class="cell"><span class="btn prs">Play</span></div>
+  <div class="cell"><span class="btn foc">Play</span></div>
+  <div class="cell"><span class="btn dis">Play</span></div>
+
+  <div class="rl">Tab</div>
+  <div class="cell"><span class="tab">Armor</span></div>
+  <div class="cell"><span class="tab hov">Armor</span></div>
+  <div class="cell"><span class="tab prs">Armor</span></div>
+  <div class="cell"><span class="tab foc">Armor</span></div>
+  <div class="cell"><span class="tab dis">Armor</span></div>
+
+  <div class="rl">Item Slot</div>
+  <div class="cell"><span class="slot">◆</span></div>
+  <div class="cell"><span class="slot hov">◆</span></div>
+  <div class="cell"><span class="slot prs">◆</span></div>
+  <div class="cell"><span class="slot foc">◆</span></div>
+  <div class="cell"><span class="slot dis">▤</span></div>
+</div>
+
+<div class="note">
+<strong style="color:var(--fg-1)">Recipe</strong> — <b>Hover:</b> accent glow (<code>--glow-teal</code>) + <code>--border-bright</code>. <b>Press/active:</b> brighter fill (accent bg, <code>--void-0</code> text) or gold underline for tabs, transition <code>--dur-fast --ease-ui</code>. <b>Focus:</b> always <code>2px solid var(--focus-ring)</code> with offset — required for keyboard & controller. <b>Disabled:</b> <code>--fg-disabled</code> text, <code>--border-panel</code>, no glow, reduced opacity, no pointer events. Selection reuses the press recipe. Every interactive element must define all five.
+</div>
+</body></html>

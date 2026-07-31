@@ -1,0 +1,14 @@
+<!-- @dsCard group="FX & Animation" viewport="860x560" name="Combat & weapon FX" subtitle="8 combat-effect families — melee, ranged, energy, elemental, status, heal, critical & environment (32×32, additive)" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>
+body{margin:0;padding:16px;background:var(--surface-page);color:var(--text-primary);display:flex;flex-direction:column;gap:10px}
+.s{border:1px solid var(--border-panel);border-radius:var(--radius-1);overflow:hidden;background:#05070d}
+.s h5{margin:0;padding:5px 9px;font-family:var(--font-display);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-secondary,#9ab);border-bottom:1px solid var(--border-panel)}
+.s img{width:100%;display:block}
+</style></head><body>
+<div id="g" style="display:flex;flex-direction:column;gap:10px"></div>
+<script>
+const B='../assets/fx/combat/';
+const L=[['melee','Melee & physical'],['ranged','Ranged & projectile'],['energy-tech','Energy & tech'],['magic-elemental','Magic & elemental'],['status-debuff','Status & debuff'],['heal-support','Heal & support'],['critical-finisher','Critical & finisher'],['environment-impact','Environment impacts']];
+g.innerHTML=L.map(([f,n])=>`<div class="s"><h5>${n}</h5><img src="${B}${f}.png" alt="${n}"></div>`).join('');
+</script>
+</body></html>

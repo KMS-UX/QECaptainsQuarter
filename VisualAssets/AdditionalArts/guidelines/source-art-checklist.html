@@ -1,0 +1,133 @@
+<!-- @dsCard group="Guidelines" viewport="960x1360" name="Source-art request checklist" subtitle="Exact specs to commission production-ready raw exports (characters, tiles, props, icons)" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>
+body{margin:0;padding:22px;background:var(--surface-page);color:var(--text-body);font-family:var(--font-ui);font-size:12px;line-height:1.55}
+h3{font-family:var(--font-display);text-transform:uppercase;letter-spacing:.14em;color:var(--text-heading);font-size:16px;margin:0 0 4px}
+.lead{color:var(--text-muted);font-size:11px;margin:0 0 18px;max-width:780px}
+.sec{margin-bottom:14px;background:var(--surface-panel);border:1px solid var(--border-panel);border-top:2px solid var(--teal);padding:14px 16px}
+.sec.gold{border-top-color:var(--atom-gold)}.sec.purple{border-top-color:var(--quantum-purple)}.sec.green{border-top-color:var(--success-green)}.sec.red{border-top-color:var(--alert-red)}
+h4{font-family:var(--font-display);text-transform:uppercase;letter-spacing:.12em;color:var(--text-section);font-size:11px;margin:0 0 10px;display:flex;gap:8px;align-items:baseline}
+h4 .n{color:var(--atom-gold);font-size:10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+ul{margin:4px 0 0;padding-left:16px;color:var(--text-muted)}li{margin-bottom:4px}
+b{color:var(--text-body)}
+code{background:var(--surface-inset);border:1px solid var(--border-panel);padding:1px 5px;color:var(--success-green);font-size:11px}
+.chk{list-style:none;padding-left:0}.chk li{position:relative;padding-left:22px}
+.chk li:before{content:"";position:absolute;left:0;top:2px;width:12px;height:12px;border:1px solid var(--teal);background:var(--surface-inset)}
+.must{color:var(--alert-red);font-weight:700}
+.note{font-size:10px;color:var(--text-faint);margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:11px;margin-top:6px}
+th,td{text-align:left;padding:4px 8px;border-bottom:1px solid var(--border-panel)}
+th{font-family:var(--font-display);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-faint);font-weight:400}
+td.k{color:var(--teal);white-space:nowrap}
+.copy{background:var(--surface-inset);border:1px solid var(--border-panel);padding:10px 12px;font-size:10.5px;color:var(--text-muted);white-space:pre-wrap;line-height:1.5;margin-top:8px}
+</style></head><body>
+<h3>Source-Art Request Checklist</h3>
+<p class="lead">Send this to your artist or image generator to get <b>production-ready raw exports</b> — not catalog/preview montages. The montages received so far (icons, characters, tileset) are useful references but are opaque, upscaled, and wrapped in UI chrome. Every deliverable below must satisfy the <b>Golden rules</b> first. Pairs with the Asset Pipeline card.</p>
+
+<div class="sec red">
+<h4><span class="n">00</span> Golden rules — reject a delivery that fails any of these</h4>
+<div class="grid">
+<ul class="chk">
+<li><span class="must">Transparent</span> PNG-32 (real alpha) — <b>no</b> baked background, panels, or slot frames.</li>
+<li><span class="must">Native resolution</span> — authored at true pixel size (see table), <b>not</b> upscaled then shrunk.</li>
+<li><span class="must">No chrome</span> — no titles, palettes, legends, frame numbers, drop shadows, or glow bleeding past the sprite.</li>
+</ul>
+<ul class="chk">
+<li><span class="must">Uniform grid</span>, margin 0 / spacing 0, one cell = one frame/tile.</li>
+<li>Consistent <b>pivot</b> across every frame of an actor (feet bottom-center).</li>
+<li>Deliver the <b>raw sheet files</b> + a plain frame-count list; montage previews optional.</li>
+</ul>
+</div>
+</div>
+
+<div class="sec">
+<h4><span class="n">01</span> Canvas / cell sizes to specify</h4>
+<table>
+<tr><th>Asset</th><th>Cell (native px)</th><th>Grid rule</th></tr>
+<tr><td class="k">World tile</td><td>16 × 16</td><td>atlas ≤ 2048², margin/spacing 0</td></tr>
+<tr><td class="k">Prop / decoration</td><td>multiples of 16 (16–64)</td><td>packed, 2px spacing, alpha</td></tr>
+<tr><td class="k">Player / humanoid</td><td>64 × 64</td><td>uniform grid, feet-centered</td></tr>
+<tr><td class="k">Elite / large NPC</td><td>96 × 96</td><td>uniform grid</td></tr>
+<tr><td class="k">Boss</td><td>128 × 128 (or 192²)</td><td>uniform grid, power-of-2 cell</td></tr>
+</table>
+</div>
+
+<div class="sec purple">
+<h4><span class="n">02</span> Character sprite sheets (per actor)</h4>
+<div class="grid">
+<div>
+<b>One PNG per actor</b>, all clips share the 64×64 cell. Frames left→right, clips top→bottom. Request these clips + frame counts:
+<table>
+<tr><th>Clip</th><th>Frames</th><th>Loop</th></tr>
+<tr><td class="k">idle</td><td>4–6</td><td>yes</td></tr>
+<tr><td class="k">walk / run</td><td>6–8</td><td>yes</td></tr>
+<tr><td class="k">attack 1 / 2</td><td>4–6</td><td>no</td></tr>
+<tr><td class="k">hit · death</td><td>2–3 · 5–8</td><td>no</td></tr>
+<tr><td class="k">dash · cast</td><td>4–6</td><td>no</td></tr>
+</table>
+</div>
+<div>
+<ul>
+<li><b>4-direction min</b> (S / N / E; W = mirror). Keep the sprite's feet pivot on the same pixel in every frame.</li>
+<li>Ask for a companion <b>frame-map</b>: <code>clip,row,frameCount,fps,loop</code> so it drops straight into Godot <code>SpriteFrames</code>.</li>
+<li>Actors to commission first: <b>Aurin (player)</b>, <b>Lyra</b>, <b>Kai</b>, <b>QUARK</b>, plus 2–3 common enemies + 1 boss.</li>
+<li>Palette-lock to the QE Quantum Core palette (share <code>tokens/colors.css</code>).</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div class="sec gold">
+<h4><span class="n">03</span> Tileset atlas (per biome)</h4>
+<ul>
+<li><b>16×16</b> tiles, margin 0 / spacing 0, one atlas per biome — <b>Slums, Undercity, Wasteland, Lab, Neo-Solis</b> (matches env palettes).</li>
+<li>Include <b>auto-tile / terrain sets</b>: request the 47-tile (blob) or Godot terrain layout for ground, water, cliffs — not just loose tiles.</li>
+<li>Mark which tiles are <b>solid</b> (collision) vs <b>walkable</b> vs <b>overhead</b> (roofs that fade); a collision key image or list.</li>
+<li>Tiles opaque OK; anything with a soft edge (foliage, decals) needs alpha.</li>
+</ul>
+</div>
+
+<div class="sec green">
+<h4><span class="n">04</span> Props, architecture & 9-slice</h4>
+<div class="grid">
+<ul>
+<li>Props/decoration/vehicles as a <b>transparent</b> packed atlas + region map (TexturePacker JSON or Godot <code>.tres</code>).</li>
+<li>Group by biome/use; keep each atlas ≤ 2048².</li>
+</ul>
+<ul>
+<li>Ornate UI frames (rarity, boss, featured) as <b>nine-patch</b> PNGs with stated patch margins (see Asset Pipeline §07).</li>
+<li>Building kit: walls/floors/roofs/doors as modular 16px pieces with consistent connection edges.</li>
+</ul>
+</div>
+</div>
+
+<div class="sec">
+<h4><span class="n">05</span> Delivery, naming &amp; format</h4>
+<div class="grid">
+<ul>
+<li>PNG only (no JPG). Indexed or 32-bit, alpha straight (not premultiplied).</li>
+<li>Files: <code>actor_state_dir.png</code>, <code>tile_biome_variant.png</code>, <code>prop_biome_name.png</code>, <code>icon_category_name.png</code> — lower_snake_case.</li>
+<li>Zero-padded frame indices <code>_00 _01</code>; direction suffix <code>_s _n _e</code>.</li>
+</ul>
+<ul>
+<li>Include a <b>source file</b> (Aseprite <code>.ase</code> ideal) so frames/pivots/tags are editable.</li>
+<li>Provide a <b>palette swatch</b> file to confirm color-lock.</li>
+<li>One <b>contact sheet</b> per delivery for review is welcome — as an <i>extra</i>, never the only file.</li>
+</ul>
+</div>
+</div>
+
+<div class="sec purple">
+<h4><span class="n">06</span> Copy-paste brief (fill the brackets)</h4>
+<div class="copy">Deliver raw, GAME-READY pixel art for a 2D pixel-art RPG (Godot 4, Android).
+HARD REQUIREMENTS: transparent PNG-32 (no background/panels/labels); authored at
+NATIVE resolution (tiles 16x16, characters 64x64, bosses 128x128); uniform grid,
+margin 0 / spacing 0; consistent feet bottom-center pivot per actor.
+DELIVER: [actor/biome] as [N] sheets + a frame-map (clip,row,frames,fps,loop).
+CLIPS (characters): idle, walk, run, attack1, attack2, hit, death, dash [+4-dir].
+PALETTE: lock to the attached QE Quantum Core swatches.
+FORMAT: PNG + Aseprite source. NO upscaled-then-downscaled art. NO montage-only files.</div>
+</div>
+
+<p class="note">Provide any of these and I'll wire the atlas layout, naming, collision/terrain data, and Godot <code>SpriteFrames</code> / <code>TileSet</code> <code>.tres</code> import resources.</p>
+</body></html>

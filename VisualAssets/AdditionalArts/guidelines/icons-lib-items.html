@@ -1,0 +1,31 @@
+<!-- @dsCard group="Icon Library" viewport="760x560" name="Combat · currency · world" subtitle="Individually-sliced icons — 93 named PNG tiles ready to drop into slots" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>
+body{margin:0;padding:16px;background:var(--surface-page);display:flex;flex-direction:column;gap:14px;color:var(--text-primary)}
+.grp{display:flex;flex-direction:column;gap:7px}
+.h{font-family:var(--font-display);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-section)}
+.sub{font-family:var(--font-ui);font-size:9px;letter-spacing:.06em;color:var(--text-faint);margin-left:6px}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.s{width:40px;height:40px;background:var(--surface-inset);border:1px solid var(--border-panel);border-radius:var(--radius-1);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.s img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
+.lbl{display:flex;flex-direction:column;gap:2px;width:40px}
+.lbl span{font-family:var(--font-ui);font-size:7px;text-align:center;color:var(--text-faint);letter-spacing:.02em}
+</style></head><body>
+<div class="grp"><div class="h">Weapons<span class="sub">35 · swords / blades / spears / bows / staves</span></div>
+<div class="row" id="wpn"></div></div>
+<div class="grp"><div class="h">Currencies &amp; tokens<span class="sub">21 · coins / gems / tokens / vouchers / reputation / energy</span></div>
+<div class="row" id="cur"></div></div>
+<div class="grp"><div class="h">Elements &amp; damage<span class="sub">16 · types + runic variants</span></div>
+<div class="row" id="ele"></div></div>
+<div class="grp"><div class="h">Chests<span class="sub">7 rarity tiers</span></div><div class="row" id="cst"></div></div>
+<div class="grp"><div class="h">World markers<span class="sub">map locations + achievements</span></div><div class="row" id="wld"></div></div>
+<script>
+const B='../assets/icon-library/';
+function fill(id,paths){document.getElementById(id).innerHTML=paths.map(p=>`<div class="s"><img src="${B}${p}"></div>`).join('');}
+const sub=['swords','blades','spears','bows','staves'];
+fill('wpn',sub.flatMap(s=>[1,2,3,4,5,6,7].map(i=>`weapons/${s}-${i}.png`)));
+fill('cur',['coin-1','coin-2','coin-3','gem-1','gem-2','gem-3','gem-4','gem-5','gem-6','token-1','token-2','token-3','voucher-1','voucher-2','voucher-3','reputation-1','reputation-2','reputation-3','energy-1','energy-2','energy-3'].map(n=>`currencies/${n}.png`));
+fill('ele',Array.from({length:16},(_,i)=>`elements/elem-${String(i+1).padStart(2,'0')}.png`));
+fill('cst',['wooden','iron','golden','rare','epic','mythic','legendary'].map(n=>`chests/chest-${n}.png`));
+fill('wld',['map/map-town','map/map-dungeon','map/map-camp','map/map-ruins','map/map-sanctuary','map/map-portal','map/map-boss','map/map-poi','achievements/achievement','achievements/trophy','achievements/challenge','achievements/collection','achievements/victory','achievements/mastery'].map(n=>`${n}.png`));
+</script>
+</body></html>

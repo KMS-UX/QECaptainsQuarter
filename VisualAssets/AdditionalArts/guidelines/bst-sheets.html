@@ -1,0 +1,17 @@
+<!-- @dsCard group="Bestiary" viewport="860x560" name="Enemy & creature reference sheets" subtitle="Full annotated bibles — wildlife, boss design, 4-part enemy reference (rosters, skills, mods, drops, equipment)" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>
+body{margin:0;padding:16px;background:var(--surface-page);color:var(--text-primary);display:flex;flex-direction:column;gap:14px}
+p{margin:0;font-size:11px;line-height:1.5;color:var(--text-secondary,#8aa)}
+figure{margin:0;position:relative;border:1px solid var(--border-panel);border-radius:var(--radius-1);overflow:hidden;background:var(--surface-inset)}
+figure img{width:100%;display:block}
+figcaption{position:absolute;top:8px;left:8px;padding:3px 9px;background:rgba(3,6,12,.74);border:1px solid var(--border-panel);border-radius:var(--radius-1);font-family:var(--font-display);font-size:9px;letter-spacing:.1em;text-transform:uppercase}
+</style></head><body>
+<p>Full annotated production bibles — reference for creature ecosystems, boss design principles (silhouette, phases, telegraph colours, arenas) and the enemy roster across four parts: corrupted humans, machines, void aberrations, mutants, elites, plus skills, modifications, drops and equipment.</p>
+<div id="g"></div>
+<script>
+const B='../assets/bestiary/sheets/';
+const L=[['wildlife-reference','Wildlife & Neutral Creatures'],['boss-design-bible','Boss Design Bible'],['enemy-reference-1','Enemy Reference · Part 1 — Corrupted / Techno / Psionic'],['enemy-reference-2','Enemy Reference · Part 2 — Aberrations / Mutants / Machines'],['enemy-reference-3','Enemy Reference · Part 3 — High-Threat & Boss Class'],['enemy-catalog','Enemy Catalog — Factions, Mods & Equipment']];
+g.innerHTML=L.map(([f,n])=>`<figure><img src="${B}${f}.png" alt="${n}"><figcaption>${n}</figcaption></figure>`).join('');
+g.style.cssText='display:flex;flex-direction:column;gap:14px';
+</script>
+</body></html>

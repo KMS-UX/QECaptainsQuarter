@@ -1,0 +1,81 @@
+<!-- @dsCard group="Showcase" viewport="1280x720" name="In-Game HUD" subtitle="Exploration screen assembled from live components — player vitals, minimap, quest tracker, hotbar, dialogue & boss bar" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>
+html,body{margin:0}
+#r{position:relative;width:1280px;height:720px;overflow:hidden;font-family:var(--font-ui)}
+#r .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#r .vig{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 40%,transparent 45%,rgba(3,6,12,.72) 100%);pointer-events:none}
+#r .scan{position:absolute;inset:0;background-image:var(--scanline);opacity:.5;pointer-events:none;mix-blend-mode:overlay}
+.lay{position:absolute}
+.tl{top:20px;left:20px}.tr{top:20px;right:20px;display:flex;flex-direction:column;gap:12px;align-items:flex-end}
+.tc{top:20px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:10px;align-items:center}
+.bl{bottom:22px;left:20px;display:flex;flex-direction:column;gap:10px}
+.bc{bottom:22px;left:50%;transform:translateX(-50%);width:660px;display:flex;flex-direction:column;gap:10px}
+.hot{display:flex;gap:8px}
+.zone{font-family:var(--font-display);font-size:26px;letter-spacing:.16em;text-transform:uppercase;color:var(--fg-1);text-shadow:0 2px 12px rgba(0,0,0,.9);line-height:1}
+.zsub{font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--teal);margin-top:5px}
+.bosswrap{width:100%;text-align:center}
+.bossnm{font-family:var(--font-display);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--quantum-purple);text-shadow:0 0 10px rgba(0,0,0,.9);margin-bottom:5px}
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../_ds_bundle.js"></script></head><body><div id="r"></div>
+<script type="text/babel">
+const {Panel,StatBar,Minimap,QuestTracker,ItemSlot,DialogueBox,Notification,Button}=window.QuantumEffectDesignSystem_2d830e;
+const B="../assets/icons/";
+function Screen(){return <>
+ <img className="bg" src="../assets/keyart-neosolis.png" alt=""/>
+ <div className="vig"></div><div className="scan"></div>
+
+ <div className="lay" style={{top:20,left:'50%',transform:'translateX(-50%)',textAlign:'center'}}>
+   <div className="zone">Neo-Solis · Core District</div>
+   <div className="zsub">Contested Territory · Void Seeker Presence</div>
+ </div>
+
+ <div className="lay tl">
+   <Panel title="Aurin · Lv. 23" style={{width:260}}>
+     <div style={{display:'flex',flexDirection:'column',gap:8}}>
+       <StatBar kind="hp" label="HP" value={430} max={520}/>
+       <StatBar kind="ep" label="EP" value={65} max={80}/>
+       <StatBar kind="xp" label="XP" value={38} max={100}/>
+     </div>
+   </Panel>
+ </div>
+
+ <div className="lay tr">
+   <Minimap shape="circular" size={150} heading={40}
+     blips={[{kind:'player',x:.5,y:.5},{kind:'ally',x:.6,y:.42},{kind:'enemy',x:.34,y:.62},{kind:'enemy',x:.28,y:.55},{kind:'objective',x:.72,y:.7},{kind:'poi',x:.3,y:.32}]} label="Core District"/>
+   <QuestTracker quests={[
+     {tier:'main',title:'The Core Relay',sub:'Reach the Core Relay',active:true},
+     {tier:'side',title:'Lost Supply Cache',sub:'Recover Supplies (3/5)'},
+     {tier:'world',title:'Void Rift Surge',timer:'02:45:18'}]}/>
+ </div>
+
+ <div className="lay tc" style={{top:96}}>
+   <Notification items={["Quest Updated · The Core Relay","Skill Point Acquired","Aurelian Order reputation +150"]}/>
+ </div>
+
+ <div className="lay bl">
+   <div className="hot">
+     <ItemSlot rarity="legendary" image={B+"weapon-sword-legendary.png"} quality="+15" badge="equipped"/>
+     <ItemSlot rarity="epic" image={B+"crystal-essence.png"} count={3}/>
+     <ItemSlot rarity="common" image={B+"potion-health.png"} count={5}/>
+     <ItemSlot rarity="rare" image={B+"weapon-sword-rare.png"}/>
+     <ItemSlot rarity="uncommon" image={B+"gem-green.png"} count={12}/>
+     <ItemSlot empty/>
+   </div>
+ </div>
+
+ <div className="lay bc">
+   <div className="bosswrap">
+     <div className="bossnm">Void Sentinel · Elite</div>
+     <StatBar kind="boss" value={76} max={100} showValue={false} height={16}/>
+   </div>
+   <DialogueBox kind="dialogue" speaker="Lyra" portrait="../assets/portrait-lyra.png"
+     actions={<><Button size="sm">Continue</Button><Button size="sm" variant="ghost">Ask about the Relay</Button></>}>
+     The readings confirm it — the Core Relay is just ahead. Whatever the Void Seekers want with it, we can't let them reach it first.
+   </DialogueBox>
+ </div>
+</>;}
+ReactDOM.createRoot(document.getElementById('r')).render(<Screen/>);
+</script></body></html>
