@@ -32,7 +32,8 @@ enum class CabinetNode {
     GREENHOUSE,
     AQUARIUM,
     PET_SANCTUARY,
-    ELEVATOR
+    ELEVATOR,
+    DISPLAY_SHELF
 }
 
 data class ChatMessage(

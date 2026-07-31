@@ -4,7 +4,7 @@ Living document for tracking the ship-immersion redesign initiative. See
 `Quantum Effect Captain's Quarters Build Bible.txt` for the full design vision;
 this file tracks *implementation* status against it.
 
-Last updated: 2026-07-31 (session 4)
+Last updated: 2026-07-31 (session 6)
 
 ## Current initiative: "Dynamic wallpaper" starship
 
@@ -50,6 +50,54 @@ the local proxy); verification was manual review plus a brace/paren/bracket
 balance script, matching the process documented below. Watch the `Build
 Android APK` GitHub Actions workflow after this branch merges.
 
+| 7 | (unmerged, this branch) | **Display Shelf** (Build Bible: "Player achievements. Alien artifacts. Models. Photographs. Crew gifts."), the one item from session 4's "suggested next session" list that had no prior implementation. Session start also confirmed PR #4/#5/#6 had *already* been merged directly to `main` outside the PR flow (the PRs themselves show `merged:false`/`closed` on GitHub, but `main`'s HEAD matches this branch's pre-session commit exactly) — that suggested-next-session item is done, nothing to merge. New work this session: added `CabinetNode.DISPLAY_SHELF`, a Canvas-drawn `DisplayCabinetObject` physical hotspot (glass case, glowing medals/curio silhouette — same vector-prop treatment as every other Captain's Quarters hotspot, not a raster sprite) placed at x=1140dp between the Bookshelf (1020dp) and Elevator (now 1250dp, shifted right from 1200dp to make room — checked the shift keeps the elevator's 110dp-wide column within the 1380dp panorama, since the old 1200dp start already left only 180dp of margin), and a `DisplayShelfPanel` with 3 tabs. Rather than inventing a fake achievements database, **Mementos** are 8 milestones computed live from state that already exists and only grows (companion affinity, plant growth, completed research, placed decorations, log count, calendar day) — no new persisted schema. **Gifts** scans each companion's existing `chatHistory` for "Replicated and presented gift:" messages (already logged by `replicateCompanionGift`, just never surfaced anywhere) and shows what's been given per companion, with an honest "nothing presented yet" empty state if none have. **Curios** (alien artifacts/models/photographs) has no underlying collection mechanic in the game at all, so it's an honest "ARTIFACT BAY: EMPTY" placeholder rather than fabricated content — a real feature would need its own next session. Also cropped `QE_FUR_010_DisplayCabinet` from `QE_FUR_CON.png` into `img_icon_display_shelf.png` (same chroma-key-by-brightness/saturation approach as session 4's icon crops) for the panel header banner, following the `PanelIconBanner` pattern from Bookshelf/Coffee Corner. Along the way, confirmed `DecorationState`/`purchaseDecoration`/`toggleDecoration` (the Build Bible's separate "Personal Decorations" bullet, right after Display Shelf) already exists and is already surfaced — it's tab index 2 ("IV. COZY QUARTERS ORNAMENTS") inside `LivingShipEcosystemTab`, reached from the Captain's Desk panel — so it needed no new work, just confirmation it wasn't being duplicated. |
+
+| 8 | (unmerged, this branch) | **Artwork brush-up pass**, prompted by the user after new visual assets landed in the repo (`VisualAssets/AdditionalArts/`, `VisualAssets/QE_AMB.png`, `Uploads/QuantumEffectMap/`). Investigated all three; only `QE_AMB.png` turned out usable this session — see the new "AdditionalArts / Uploads — investigated, not used" note below for why the other two were set aside rather than force-fit. Two concrete swaps, both sourced from this game's own in-house `QE_`-batch art (not the sister-game dumps), both replacing a Canvas-drawn "simple graphic" with real painted art in an *existing, already-reachable* feature: (1) `GalaxyRadarSection` (the RADAR tab inside the Captain's Desk panel — real `SectorState` data, previously flagged as "premature" in session 4 because a search for a literal "star map screen" didn't turn it up under that name) now has a painted circuit-hex starmap backdrop (`img_starmap_hex.png`, cropped from `QE_AMB.png`'s `QE_ANI_006_Star_Map_Procedural_Hex`) behind the existing Canvas radar sweep/rings, and each of the 6 sectors' radar nodes now renders a themed painted planet sprite (`img_sector_planet_{home,tech,sanctuary,anomaly,nebula,plasma}.png`, cropped from `GalaxyExploration.png`'s `QE_ANI_006_Dynamic_Planet_Sprite` row, matched to each sector's lore via `getSectorPlanetIcon(sectorId)`) instead of the old flat color dot — color-coded rings are kept for the alignment cue. (2) Two more panels got a `getPanelIcon` entry (the header-badge mechanism from session 4, previously only DESK/AI/COFFEE/BOOKSHELF/DISPLAY_SHELF): `GREENHOUSE` gets `img_icon_holographic_planter.png` (`QE_DEC_017_HolographicPlanter`, `QE_EXPAN_SEASONAL.png`) and `PET_SANCTUARY` gets `img_icon_pet_dock.png` (`QE_DEC_019_RobotPetDock`, same sheet) — both panels had no header icon at all before, so this was a pure addition, no risk of clashing with an existing treatment. Deliberately did *not* touch any panorama hotspot's physical prop rendering (`DisplayCabinetObject`, `CoffeeBrewingObject`, etc. all stay Canvas-vector) — that stays a deliberate house-style choice per the Architecture notes, not something this pass second-guessed. |
+
+### AdditionalArts / Uploads — investigated, not used
+
+Session 6 also surveyed the two new asset dumps beyond `QE_AMB.png` and is
+recording *why* they weren't used, so a future session doesn't have to
+re-open every sheet to re-derive the same conclusion:
+- **`VisualAssets/AdditionalArts/`** is a complete, self-contained design
+  system bundle (its own `SKILL.md`/`readme.md`, React components, HTML
+  style guides, CSS tokens) for a *different, related game* also called
+  "Quantum Effect" — a top-down 2D pixel-art RPG, not this game. Its own
+  docs call the character/prop sprites "prototype-grade... good for
+  greyboxing, not final." Checked its `Characters/sheets/companion-reference.png`
+  (a 5-companion roster: Atom/Lumen/Nia/Rex/Echo) and
+  `Uploads/QuantumEffectMap/QuantumBabyCompanions.png` (a *different* 6-companion
+  roster: Lyra-the-Scout/Drox/Nix/Vayn/Elsi/Grum) against this game's actual
+  4 companions (Lyra/Nova/Elara/Quark) — neither matches, and the two sheets
+  don't even agree with each other, confirming this is unfinished pitch
+  material for the sister game, not a canon reference for ours. One
+  genuine 1:1 hit: `Characters/sheets/dialogue-expression.png` has a
+  "COMPANION – QUARK (ANDROID)" portrait row (round android head, glowing
+  cyan face) that matches this game's Quark (`role = "Android Companion"`,
+  `colorHex = "00F0FF"` cyan) almost exactly. Left it unused anyway — every
+  companion currently gets identical treatment (a `colorHex` dot +
+  Canvas-drawn `CompanionQuartersDecor`, no portraits for anyone), and giving
+  only Quark a real portrait would read as an inconsistency, not an
+  upgrade. If a portrait pass is ever wanted, it needs art for all 4
+  companions (or a decision to add portraits only where they exist and
+  accept the asymmetry) — a product decision, not a quick swap.
+  `Environment/sheets/prop-library.png` (500+ pixel props) was also
+  checked and set aside for a style reason: it's true dithered pixel-art
+  furniture in warm wood tones, visibly different rendering fidelity and
+  palette from this game's clean cyan/teal isometric-icon furniture
+  (`QE_FUR_CON.png`) — mixing the two in the same panel header slot would
+  look like two different games.
+- **`Uploads/QuantumEffectMap/`** is a Godot project's asset import (`.import`
+  sidecar files) for a top-down 2D prototype — `QuantumEffectEnemy1-4.png`,
+  `QuantumEffectFactions1/2.png`, `QuantumEffectStarships.png`, etc. Same
+  sister-game/prototype status as `AdditionalArts/`; nothing here has a
+  companion/faction/prop that matches this game's established roster or
+  visual bible, so none of it was used.
+- `QE_AMB.png` (the one asset from this batch that *was* used, see row 8) is
+  from this game's own art pipeline (same `QE_ANI_XXX` naming and reference-
+  sheet template as `WeatherOverlay.png`/`GalaxyExploration.png`), which is
+  why it slotted in cleanly with no style mismatch.
+
 ### VisualAssets inventory — what's usable vs. reference-only
 
 The full `VisualAssets/` folder (19 PNGs + a placeholder note) is now on
@@ -67,11 +115,12 @@ current game and needs a deliberate decision before use:
   - `LivingUniverse_Progression.png` — cropped `QE_DEC_013/014/015` into
     `img_plant_seed/sprout/mature.png`, swapped into `PlantVisualStem`.
   - `QE_FUR_CON.png` — cropped `QE_FUR_001_CaptainDesk`, `QE_CON_004_AICoreConsole`,
-    and `QE_FUR_011_Bookshelf` into `img_icon_captain_desk/ai_core/bookshelf.png`,
-    used as panel-header icons/banners. `QE_FUR_010_DisplayCabinet`,
-    `QE_CON_010_HolographicDisplay`, and `QE_CON_014_StellarArchive` are
-    cropped-quality-verified but still unused — good candidates if the
-    Display Shelf section (Build Bible) or a Bookshelf sub-tab gets built out.
+    `QE_FUR_011_Bookshelf` into `img_icon_captain_desk/ai_core/bookshelf.png`,
+    and (session 5) `QE_FUR_010_DisplayCabinet` into `img_icon_display_shelf.png`,
+    used as panel-header icons/banners. `QE_CON_010_HolographicDisplay` and
+    `QE_CON_014_StellarArchive` are still cropped-quality-verified but unused —
+    good candidates for a Bookshelf sub-tab, or the Curios tab once it has a
+    real collection mechanic (see Suggested next session).
   - `CoffeeBrewingCycle.png` — used only the final "ready" frame (glowing cyan
     outline, no visible brew animation) as a static header icon
     (`img_icon_coffee_brewer.png`) for the Coffee Corner *detail panel*, not
@@ -95,11 +144,16 @@ current game and needs a deliberate decision before use:
     Elara, Quark) — using it would mean either inventing a 5th companion or
     mismatching an existing one's established look. Needs a product decision,
     not a code change.
-  - `GalaxyExploration.png`, `QE_EXPAN_SEASONAL.png`, `QE_CON_DEC_EXT_MISC.png`,
-    `QE_ENG_DEC.png` — Phase 4/5/6 icon sheets (star map, trade routes, planet
-    sprites, decorations, engineering props) for systems that don't exist yet
-    in `GameViewModel` (no star map screen, no trade mechanic). Premature to
-    wire in before the underlying feature exists.
+  - `QE_CON_DEC_EXT_MISC.png`, `QE_ENG_DEC.png` — Phase 5/6 icon sheets (trade
+    routes, engineering props) for systems that still don't exist in
+    `GameViewModel` (no trade mechanic). Premature to wire in before the
+    underlying feature exists.
+  - **Correction (session 6):** `GalaxyExploration.png` and
+    `QE_EXPAN_SEASONAL.png` were wrongly filed here in session 4 — the
+    "star map" feature they were held back for already existed
+    (`GalaxyRadarSection`, the RADAR tab inside the Captain's Desk panel,
+    driven by real `SectorState` data) and now uses them (see below). Always
+    grep the actual UI for a feature name before calling an asset premature.
   - `QE_INF1.png`, `QE_INF2.png`, `QE_EXT1.png` — a full isometric
     wall/floor/ceiling/door tile-kit and exterior hull modules. Drawn in a
     true isometric-tile style, which is a different rendering approach than
@@ -155,8 +209,16 @@ current game and needs a deliberate decision before use:
 - **Panel header icons**: `InteractivePanelContainer` takes an optional
   `iconRes: Int?` (session 4) shown in place of the plain color dot; wired via
   `getPanelIcon(CabinetNode): Int?` right next to `getPanelTitle`. Currently
-  only DESK/AI/COFFEE/BOOKSHELF have an icon — add a case there (plus crop a
-  matching PNG into `res/drawable/`) to extend to other nodes.
+  DESK/AI/COFFEE/BOOKSHELF/DISPLAY_SHELF have an icon — add a case there (plus
+  crop a matching PNG into `res/drawable/`) to extend to other nodes.
+- **Captain's Quarters hotspot spacing is now tight.** All 7 physical props
+  (window/AI/desk/coffee/bookshelf/display-shelf/elevator) share the same
+  1380dp panorama width; gaps shrink from 260dp near the window down to ~10dp
+  by the display shelf/elevator (session 5 added the display shelf between
+  bookshelf and elevator, and narrowed its own footprint to 90dp to make the
+  math work — see `DisplayCabinetObject`). Adding an 8th prop to this deck
+  without widening the panorama or removing something else will very likely
+  start actually overlapping objects, not just crowding them.
 - **No local Android SDK in the sandbox this work was done in** — could not run
   `gradle assembleDebug` locally (AGP version doesn't resolve through the local
   proxy). Verification for each PR was: careful manual review of every changed
@@ -167,28 +229,69 @@ current game and needs a deliberate decision before use:
 ## Suggested next session
 
 All 4 decks now have the spatial pass, a real painted background, weather
-overlay art, plant growth sprites, per-companion quarters decor, and polished
-detail panels — the presentation/interaction-layer initiative from this
-document's original goal is essentially feature-complete for the 4 existing
-decks. Good next candidates:
-1. **Merge PR #4/#5/#6** (Greenhouse spatial pass, deck backgrounds, and this
-   session's weather/plant/companion-rooms/panel-polish work) if not already
-   merged, and confirm `Build Android APK` is green on `main` afterward.
-2. **Display Shelf section** (Build Bible: "Player achievements, alien
-   artifacts, models, photographs, crew gifts") doesn't exist as a panel yet.
-   `QE_FUR_010_DisplayCabinet` (`QE_FUR_CON.png`, cropped/quality-checked this
-   session but unused — see VisualAssets inventory) and
-   `QE_INF_018_TrophyCase` (`LivingUniverse_Progression.png`, not yet cropped)
-   are a ready-made seed for it.
+overlay art, plant growth sprites, per-companion quarters decor, polished
+detail panels, and a Display Shelf — the presentation/interaction-layer
+initiative from this document's original goal is feature-complete for the 4
+existing decks against everything in the Build Bible's "Captain's Quarters"
+section. Good next candidates:
+1. **Confirm `Build Android APK` is green on `main`** after this branch's
+   Display Shelf work lands — check the workflow run for this branch's HEAD
+   commit specifically (there's a backlog of runs from the bulk-upload
+   commits at session start; several were still `in_progress`/queued when
+   this session began).
+2. **Curios tab has no data behind it.** `DisplayShelfPanel`'s CURIOS tab
+   (alien artifacts/models/photographs) is an honest empty-state placeholder
+   — there's no collection mechanic anywhere in `GameViewModel` for the
+   player to find/earn artifacts. Building that out for real would mean: (a)
+   a new persisted list (id/name/description/imageRes, mirroring
+   `DecorationState`'s shape), and (b) *some* in-fiction way to earn entries
+   (an exploration/sector-scan reward off `SectorState`? a rare research
+   payout? a companion affinity milestone gift?) — needs a product decision
+   on the earning mechanic before writing code, not just a UI pass.
+   `QE_INF_018_TrophyCase` (`LivingUniverse_Progression.png`, not yet
+   cropped) and the still-unused `QE_CON_010_HolographicDisplay`/
+   `QE_CON_014_StellarArchive` crops (`QE_FUR_CON.png`, cropped/
+   quality-checked in session 4 — see VisualAssets inventory) are ready-made
+   art seeds once the mechanic is decided.
 3. **Phase 2+ Build Bible systems** — nothing done yet on Daily Briefing
    content depth, Quantum Resonance Forecast, crew schedules/relationships
    beyond the existing affinity system, or the trade/galaxy simulation. These
    are gameplay/data-model work, not presentation — a different kind of
-   session than the last 4.
+   session than the last 5.
 4. If more painted companion-room art ever gets added (see `CrewSystem.png`/
    `QE_CREW_INTER.png` note above — needs a product decision on a 5th
    companion or a re-skin first), swap it in for session 4's procedural
    `CompanionQuartersDecor` Canvas backdrops.
+5. **More `getPanelIcon` gaps remain** (session 6 filled GREENHOUSE and
+   PET_SANCTUARY; WINDOW, CREW, and AQUARIUM still fall through to `else ->
+   null`, i.e. the plain color-dot header). No good in-house art was
+   identified for these three this session — check future `QE_`-batch
+   uploads for a bookshelf-adjacent console, a crew-corridor prop, or an
+   aquarium/tank icon before reaching for the sister-game dumps.
+6. **The 5 `DecorationState` entries have no icons at all** (`dec_lantern`,
+   `dec_bonsai`, `dec_gramophone`, `dec_toy`, `dec_prism` — the "IV. COZY
+   QUARTERS ORNAMENTS" list inside `LivingShipEcosystemTab`, just a colored
+   dot per row today). `QE_DEC_017_HolographicPlanter` (now used for the
+   Greenhouse panel icon, see row 8) is a strong visual match for
+   `dec_bonsai`'s "rotating hologram" description, and
+   `QE_DEC_018_DataCrystalCluster` (`QE_EXPAN_SEASONAL.png`, not yet
+   cropped) is a good match for `dec_prism`'s "glittering gemstone."
+   Deliberately left alone this session: giving 2 of 5 decorations a real
+   icon and leaving the other 3 as dots would read as unfinished, not
+   polished — this needs either art for all 5 or a decision to skip it.
+
+## Correction for future sessions: PR merge state is unreliable
+
+Session 5 discovered that GitHub's PR list for this repo shows PRs #4/#5/#6
+as `merged: false` / `state: closed` — but `main`'s actual HEAD commit
+already contained all of that work byte-for-byte (confirmed via
+`get_file_contents`/`list_commits` against `refs/heads/main`, not the local
+`origin/main` tracking ref, which was stale until an explicit
+`git fetch origin +refs/heads/main:refs/remotes/origin/main` — a plain
+`git fetch origin main` silently no-opped in this sandbox). **Don't trust
+this progress.md's "not yet opened/merged" notes about PR state at face
+value** — always check `main`'s real HEAD content/commit log directly before
+assuming something needs merging.
 
 No local Android SDK in this sandbox either — same verification method as
 prior sessions: careful manual review of Compose API usage (brace/paren

@@ -533,6 +533,7 @@ fun CabinView(state: GameUiState, viewModel: GameViewModel) {
             CabinetNode.AQUARIUM -> 0.5f
             CabinetNode.PET_SANCTUARY -> 0.75f
             CabinetNode.ELEVATOR -> 0.5f
+            CabinetNode.DISPLAY_SHELF -> 0.83f
             else -> 0.5f
         },
         animationSpec = tween(durationMillis = 900, easing = FastOutSlowInEasing),
@@ -551,6 +552,7 @@ fun CabinView(state: GameUiState, viewModel: GameViewModel) {
             CabinetNode.AQUARIUM -> 0.5f
             CabinetNode.PET_SANCTUARY -> 0.45f
             CabinetNode.ELEVATOR -> 0.5f
+            CabinetNode.DISPLAY_SHELF -> 0.58f
             else -> 0.5f
         },
         animationSpec = tween(durationMillis = 900, easing = FastOutSlowInEasing),
@@ -672,11 +674,19 @@ fun CabinView(state: GameUiState, viewModel: GameViewModel) {
                             onClick = { if (zoomedNode == null) zoomedNode = CabinetNode.BOOKSHELF }
                         )
 
-                        // 6. TRANSIT ELEVATOR PORTAL
+                        // 6. DISPLAY SHELF (Glass trophy/curio cabinet)
+                        DisplayCabinetObject(
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .offset(x = 1140.dp, y = 190.dp),
+                            onClick = { if (zoomedNode == null) zoomedNode = CabinetNode.DISPLAY_SHELF }
+                        )
+
+                        // 7. TRANSIT ELEVATOR PORTAL
                         StarshipElevatorHotspot(
                             modifier = Modifier
                                 .align(Alignment.TopStart)
-                                .offset(x = 1200.dp, y = 100.dp),
+                                .offset(x = 1250.dp, y = 100.dp),
                             onClick = { if (zoomedNode == null) zoomedNode = CabinetNode.ELEVATOR }
                         )
                     }
@@ -943,6 +953,7 @@ fun CabinView(state: GameUiState, viewModel: GameViewModel) {
                     CabinetNode.AQUARIUM -> AquariumPanel(state, viewModel)
                     CabinetNode.PET_SANCTUARY -> PetSanctuaryPanel(state, viewModel)
                     CabinetNode.ELEVATOR -> ElevatorPanel(activeDeck, onElevatorDeckSelected, state, viewModel)
+                    CabinetNode.DISPLAY_SHELF -> DisplayShelfPanel(state, viewModel)
                     else -> Spacer(modifier = Modifier.height(1.dp))
                 }
             }
@@ -1607,6 +1618,124 @@ fun StellarCodexObject(
     }
 }
 
+// A glass-fronted trophy case: mementos and curios glow softly behind the pane,
+// same physical-prop-not-icon treatment as the other panorama hotspots.
+@Composable
+fun DisplayCabinetObject(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "display_cabinet")
+    val glowPulse by infiniteTransition.animateFloat(
+        initialValue = 0.35f,
+        targetValue = 0.85f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "cabinet_glow"
+    )
+
+    Column(
+        modifier = modifier
+            .width(90.dp)
+            .clickable(onClick = onClick),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
+            modifier = Modifier.size(width = 74.dp, height = 80.dp),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val w = size.width
+                val h = size.height
+
+                // Cabinet frame
+                drawRoundRect(
+                    color = Color(0xFF1A2230),
+                    topLeft = Offset(0f, 0f),
+                    size = androidx.compose.ui.geometry.Size(w, h),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(4f, 4f)
+                )
+                // Glass pane, glowing softly
+                drawRoundRect(
+                    color = CyberAmber.copy(alpha = glowPulse * 0.12f),
+                    topLeft = Offset(w * 0.08f, h * 0.08f),
+                    size = androidx.compose.ui.geometry.Size(w * 0.84f, h * 0.7f),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(3f, 3f)
+                )
+                drawRoundRect(
+                    color = CyberBorder,
+                    topLeft = Offset(w * 0.08f, h * 0.08f),
+                    size = androidx.compose.ui.geometry.Size(w * 0.84f, h * 0.7f),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(3f, 3f),
+                    style = Stroke(width = 1.5f)
+                )
+                // A shelf inside splitting the case
+                drawLine(
+                    color = Color(0xFF2A3648),
+                    start = Offset(w * 0.1f, h * 0.5f),
+                    end = Offset(w * 0.9f, h * 0.5f),
+                    strokeWidth = 1.5f
+                )
+                // Medals on the top shelf
+                for (i in 0..1) {
+                    val cx = w * (0.32f + i * 0.36f)
+                    val cy = h * 0.28f
+                    drawCircle(
+                        color = listOf(CyberAmber, CyberCyanDim)[i].copy(alpha = 0.9f),
+                        radius = w * 0.07f,
+                        center = Offset(cx, cy)
+                    )
+                    drawCircle(
+                        color = Color.White.copy(alpha = glowPulse * 0.4f),
+                        radius = w * 0.03f,
+                        center = Offset(cx, cy)
+                    )
+                }
+                // A small model/curio silhouette on the bottom shelf
+                drawRoundRect(
+                    color = MatrixGreen.copy(alpha = 0.6f),
+                    topLeft = Offset(w * 0.36f, h * 0.58f),
+                    size = androidx.compose.ui.geometry.Size(w * 0.28f, h * 0.14f),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(2f, 2f)
+                )
+                // Cabinet base plinth
+                drawRoundRect(
+                    color = Color(0xFF12181F),
+                    topLeft = Offset(0f, h * 0.86f),
+                    size = androidx.compose.ui.geometry.Size(w, h * 0.14f),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(2f, 2f)
+                )
+                drawLine(
+                    color = CyberAmber.copy(alpha = glowPulse),
+                    start = Offset(w * 0.05f, h * 0.86f),
+                    end = Offset(w * 0.95f, h * 0.86f),
+                    strokeWidth = 1.5f
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = "DISPLAY SHELF",
+            color = Color.White,
+            fontSize = 9.sp,
+            fontFamily = FontFamily.Monospace,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .background(Color.Black.copy(alpha = 0.7f), RoundedCornerShape(2.dp))
+                .padding(horizontal = 4.dp, vertical = 2.dp)
+        )
+        Text(
+            text = "MEMENTOS & CURIOS",
+            color = Color.Gray,
+            fontSize = 8.sp,
+            fontFamily = FontFamily.Monospace,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
 @Composable
 fun CrewVaultDoorObject(
     modifier: Modifier = Modifier,
@@ -2024,15 +2153,19 @@ fun getPanelTitle(node: CabinetNode): String = when (node) {
     CabinetNode.AQUARIUM -> "QUANTUM BIO-AQUARIUM MANAGER"
     CabinetNode.PET_SANCTUARY -> "CYBER-PET FIRMWARE HARNESS"
     CabinetNode.ELEVATOR -> "QUANTUM TRANSIT LIFT"
+    CabinetNode.DISPLAY_SHELF -> "DISPLAY SHELF ARCHIVE"
     else -> "STARSHIP SYSTEM"
 }
 
-/** Reference-sheet icon (VisualAssets/QE_FUR_CON.png, CoffeeBrewingCycle.png) shown in the panel header, where one exists. */
+/** Reference-sheet icon (VisualAssets/QE_FUR_CON.png, CoffeeBrewingCycle.png, QE_EXPAN_SEASONAL.png) shown in the panel header, where one exists. */
 fun getPanelIcon(node: CabinetNode): Int? = when (node) {
     CabinetNode.DESK -> R.drawable.img_icon_captain_desk
     CabinetNode.AI -> R.drawable.img_icon_ai_core
     CabinetNode.COFFEE -> R.drawable.img_icon_coffee_brewer
     CabinetNode.BOOKSHELF -> R.drawable.img_icon_bookshelf
+    CabinetNode.DISPLAY_SHELF -> R.drawable.img_icon_display_shelf
+    CabinetNode.GREENHOUSE -> R.drawable.img_icon_holographic_planter
+    CabinetNode.PET_SANCTUARY -> R.drawable.img_icon_pet_dock
     else -> null
 }
 
@@ -2862,6 +2995,21 @@ fun LogItemCard(log: LogEntity, onDelete: () -> Unit) {
     }
 }
 
+/**
+ * Painted planet sprite (VisualAssets/GalaxyExploration.png, QE_ANI_006_Dynamic_Planet_Sprite)
+ * themed to each known sector's lore, used as the radar node icon instead of a flat color dot.
+ * Falls back to the nebula/rocky sprite for any future sector id not in `initialSectors`.
+ */
+fun getSectorPlanetIcon(sectorId: String): Int = when (sectorId) {
+    "home_port" -> R.drawable.img_sector_planet_home
+    "sigma_9" -> R.drawable.img_sector_planet_tech
+    "temple_core" -> R.drawable.img_sector_planet_sanctuary
+    "crevice" -> R.drawable.img_sector_planet_anomaly
+    "dark_nebula" -> R.drawable.img_sector_planet_nebula
+    "plasma_ridge" -> R.drawable.img_sector_planet_plasma
+    else -> R.drawable.img_sector_planet_nebula
+}
+
 @Composable
 fun GalaxyRadarSection(state: GameUiState, viewModel: GameViewModel) {
     val density = androidx.compose.ui.platform.LocalDensity.current
@@ -2962,6 +3110,21 @@ fun GalaxyRadarSection(state: GameUiState, viewModel: GameViewModel) {
                 shape = CutCornerShape(8.dp)
             ) {
                 Box(modifier = Modifier.fillMaxSize()) {
+                    // Painted circuit-hex starmap backdrop (VisualAssets/QE_AMB.png,
+                    // QE_ANI_006_Star_Map_Procedural_Hex) behind the live radar overlay,
+                    // replacing the previous flat CyberObsidian fill.
+                    Image(
+                        painter = painterResource(id = R.drawable.img_starmap_hex),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(CyberObsidian.copy(alpha = 0.55f))
+                    )
+
                     // Drawing dynamic radar rings, grid lines, and sweep sweep line
                     val infiniteTransition = rememberInfiniteTransition(label = "radar")
                     val angleSweep by infiniteTransition.animateFloat(
@@ -3060,12 +3223,13 @@ fun GalaxyRadarSection(state: GameUiState, viewModel: GameViewModel) {
                                     )
                             )
 
-                            // Core solid node dot
-                            Box(
-                                modifier = Modifier
-                                    .size(7.dp)
-                                    .clip(RoundedCornerShape(50))
-                                    .background(if (isSelected) CyberAmber else nodeColor)
+                            // Core node: a small painted planet sprite (VisualAssets/GalaxyExploration.png,
+                            // QE_ANI_006_Dynamic_Planet_Sprite) themed to the sector, replacing the old flat dot
+                            Image(
+                                painter = painterResource(id = getSectorPlanetIcon(sector.id)),
+                                contentDescription = null,
+                                modifier = Modifier.size(14.dp),
+                                contentScale = ContentScale.Fit
                             )
                         }
 
@@ -4079,6 +4243,212 @@ fun CodexEntry(title: String, desc: String, rep: String) {
                 )
             )
         }
+    }
+}
+
+// --- DISPLAY SHELF ARCHIVE PANEL ---
+// Build Bible: "Player achievements. Alien artifacts. Models. Photographs. Crew
+// gifts." No dedicated data model exists for this yet, so mementos are derived
+// live from existing persistent state (companions, plants, research, logs,
+// calendar day) rather than inventing a parallel tracking system. Artifacts/
+// models/photographs have no collection mechanic in the game yet, so that tab
+// is an honest "nothing archived yet" placeholder, not fabricated content.
+private data class Memento(val title: String, val desc: String, val unlocked: Boolean, val statusLine: String)
+
+@Composable
+fun DisplayShelfPanel(state: GameUiState, viewModel: GameViewModel) {
+    var selectedCategory by remember { mutableStateOf(0) } // 0 = Mementos, 1 = Gifts, 2 = Curios
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        PanelIconBanner(
+            iconRes = R.drawable.img_icon_display_shelf,
+            title = "DISPLAY SHELF ARCHIVE",
+            subtitle = "Mementos, crew gifts & recovered curios",
+            accentColor = CyberAmber
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            CategoryTab("MEMENTOS", selectedCategory == 0) { selectedCategory = 0 }
+            CategoryTab("GIFTS", selectedCategory == 1) { selectedCategory = 1 }
+            CategoryTab("CURIOS", selectedCategory == 2) { selectedCategory = 2 }
+        }
+
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+        ) {
+            when (selectedCategory) {
+                0 -> {
+                    val mementos = listOf(
+                        Memento(
+                            title = "First Watch",
+                            desc = "Assumed command of the ${state.shipName} and took the captain's chair.",
+                            unlocked = true,
+                            statusLine = "Stardate of commission"
+                        ),
+                        Memento(
+                            title = "Logkeeper",
+                            desc = "Maintained a personal log across at least 5 recorded entries.",
+                            unlocked = state.logs.size >= 5,
+                            statusLine = "${state.logs.size}/5 entries recorded"
+                        ),
+                        Memento(
+                            title = "Bonded Crew",
+                            desc = "Built real trust with a companion aboard.",
+                            unlocked = state.companions.any { it.affinity >= 3 },
+                            statusLine = "Best bond: ${state.companions.maxOfOrNull { it.affinity } ?: 0}/5"
+                        ),
+                        Memento(
+                            title = "Soulbound",
+                            desc = "Reached maximum affinity with a companion.",
+                            unlocked = state.companions.any { it.affinity >= 5 },
+                            statusLine = "Best bond: ${state.companions.maxOfOrNull { it.affinity } ?: 0}/5"
+                        ),
+                        Memento(
+                            title = "Green Thumb",
+                            desc = "Grew a plant in the Biomechanical Greenhouse to full maturity.",
+                            unlocked = state.plants.any { it.harvestReady || it.growthProgress >= 100 },
+                            statusLine = "Best growth: ${state.plants.maxOfOrNull { it.growthProgress } ?: 0}%"
+                        ),
+                        Memento(
+                            title = "Breakthrough",
+                            desc = "Completed a funded research project.",
+                            unlocked = state.research.any { it.progress >= 100 },
+                            statusLine = "Completed: ${state.research.count { it.progress >= 100 }}/${state.research.size}"
+                        ),
+                        Memento(
+                            title = "Curator",
+                            desc = "Placed at least 2 personal decorations in the quarters.",
+                            unlocked = state.decorations.count { it.isPlaced } >= 2,
+                            statusLine = "Placed: ${state.decorations.count { it.isPlaced }}/${state.decorations.size}"
+                        ),
+                        Memento(
+                            title = "Veteran Captain",
+                            desc = "Held command for a full week of ship-time.",
+                            unlocked = state.calendarDay >= 7,
+                            statusLine = "Day ${state.calendarDay} of command"
+                        )
+                    )
+                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        mementos.forEach { memento ->
+                            TrophyEntry(memento)
+                        }
+                    }
+                }
+                1 -> {
+                    val presentedByCompanion = state.companions.map { comp ->
+                        comp to comp.chatHistory.count { it.text.startsWith("Replicated and presented gift:") }
+                    }
+                    if (presentedByCompanion.all { it.second == 0 }) {
+                        DisplayShelfEmptyState(
+                            title = "NO GIFTS PRESENTED YET",
+                            body = "Visit a companion's quarters and replicate an item from their gift interface. Presented gifts are archived here."
+                        )
+                    } else {
+                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            presentedByCompanion.filter { it.second > 0 }.forEach { (comp, count) ->
+                                CodexEntry(
+                                    title = "${comp.name.uppercase()} // ${comp.giftType}",
+                                    desc = comp.giftReaction,
+                                    rep = "Presented $count time${if (count == 1) "" else "s"} // Bond ${comp.affinity}/5"
+                                )
+                            }
+                        }
+                    }
+                }
+                else -> DisplayShelfEmptyState(
+                    title = "ARTIFACT BAY: EMPTY",
+                    body = "No alien artifacts, ship models, or photographs cataloged yet. Recovered curios from future expeditions will be automatically archived here."
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun TrophyEntry(memento: Memento) {
+    val accent = if (memento.unlocked) CyberAmber else Color.Gray
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(1.dp, if (memento.unlocked) accent.copy(alpha = 0.5f) else CyberBorder, RoundedCornerShape(8.dp)),
+        colors = CardDefaults.cardColors(containerColor = if (memento.unlocked) CyberSteel else CyberSteel.copy(alpha = 0.5f)),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Column(modifier = Modifier.padding(14.dp)) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = if (memento.unlocked) "✓" else "🔒",
+                    color = accent,
+                    fontSize = 13.sp
+                )
+                Text(
+                    text = memento.title.uppercase(),
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        color = accent,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = FontFamily.Monospace
+                    )
+                )
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = memento.desc,
+                style = MaterialTheme.typography.bodySmall.copy(
+                    color = if (memento.unlocked) Color.LightGray else Color.Gray,
+                    fontFamily = FontFamily.SansSerif
+                )
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = memento.statusLine,
+                style = MaterialTheme.typography.labelSmall.copy(
+                    color = accent,
+                    fontFamily = FontFamily.Monospace,
+                    fontWeight = FontWeight.Bold
+                )
+            )
+        }
+    }
+}
+
+@Composable
+fun DisplayShelfEmptyState(title: String, body: String) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleSmall.copy(
+                color = Color.Gray,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.Monospace,
+                letterSpacing = 1.sp
+            )
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = body,
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.bodySmall.copy(
+                color = Color.DarkGray,
+                fontFamily = FontFamily.Monospace
+            ),
+            modifier = Modifier.padding(horizontal = 24.dp)
+        )
     }
 }
 
