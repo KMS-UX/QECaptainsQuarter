@@ -4373,7 +4373,7 @@ fun DisplayShelfPanel(state: GameUiState, viewModel: GameViewModel) {
 }
 
 @Composable
-fun TrophyEntry(memento: Memento) {
+private fun TrophyEntry(memento: Memento) {
     val accent = if (memento.unlocked) CyberAmber else Color.Gray
     Card(
         modifier = Modifier
