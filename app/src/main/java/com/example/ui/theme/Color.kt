@@ -21,3 +21,8 @@ val CyberMagenta = Color(0xFFE91E63)
 val CyberGlow = Color(0x2200F0FF)
 val CyberBorder = Color(0xFF1E354A)
 val MatrixGreen = Color(0xFF00FF66)
+
+// Weather overlay accents - sampled from VisualAssets/WeatherOverlay.png
+val NebulaViolet = Color(0xFF8B3FA8)
+val IceCometCyan = Color(0xFF7FE6F2)
+val EMIPlasma = Color(0xFFE44EB2)

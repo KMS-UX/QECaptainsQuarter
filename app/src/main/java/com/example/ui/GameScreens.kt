@@ -7,6 +7,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -16,6 +17,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -4018,6 +4020,18 @@ fun WeatherOverlayEffect(weather: String) {
                 label = "comets"
             )
 
+            // Painted ice-comet-shower texture (VisualAssets/WeatherOverlay.png,
+            // QE_FX_003_WeatherEffect_Ice) as the atmospheric backdrop, with the
+            // animated cyan comets from below streaking across it.
+            Image(
+                painter = painterResource(id = R.drawable.img_weather_ice),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .alpha(0.4f),
+                contentScale = ContentScale.Crop
+            )
+
             Canvas(modifier = Modifier.fillMaxSize()) {
                 val rand = java.util.Random(111)
                 for (i in 0..8) {
@@ -4052,24 +4066,23 @@ fun WeatherOverlayEffect(weather: String) {
                 label = "nebula"
             )
 
+            // Painted nebula-drift texture (VisualAssets/WeatherOverlay.png,
+            // QE_ANI_005_NebulaShift) breathing in and out in place of the old
+            // flat gradient blobs.
+            Image(
+                painter = painterResource(id = R.drawable.img_weather_nebula),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .alpha(pulse),
+                contentScale = ContentScale.Crop
+            )
+
             Canvas(modifier = Modifier.fillMaxSize()) {
                 drawCircle(
                     brush = Brush.radialGradient(
                         colors = listOf(
-                            CyberCyanDim.copy(alpha = pulse),
-                            CyberObsidian.copy(alpha = 0f)
-                        ),
-                        center = Offset(size.width * 0.7f, size.height * 0.3f),
-                        radius = size.width * 0.8f
-                    ),
-                    radius = size.width * 0.8f,
-                    center = Offset(size.width * 0.7f, size.height * 0.3f)
-                )
-
-                drawCircle(
-                    brush = Brush.radialGradient(
-                        colors = listOf(
-                            CyberMagenta.copy(alpha = pulse * 0.6f),
+                            CyberMagenta.copy(alpha = pulse * 0.3f),
                             CyberObsidian.copy(alpha = 0f)
                         ),
                         center = Offset(size.width * 0.2f, size.height * 0.8f),
@@ -4089,6 +4102,18 @@ fun WeatherOverlayEffect(weather: String) {
                     repeatMode = RepeatMode.Reverse
                 ),
                 label = "interference"
+            )
+
+            // Painted EMI-glitch texture (VisualAssets/WeatherOverlay.png,
+            // QE_FX_004_WeatherEffect_EMI) flashes brighter in sync with the
+            // scanline flicker below instead of staying at a constant alpha.
+            Image(
+                painter = painterResource(id = R.drawable.img_weather_emi),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .alpha(if (trigger > 0.82f) 0.35f else 0.1f),
+                contentScale = ContentScale.Crop
             )
 
             Canvas(modifier = Modifier.fillMaxSize()) {
@@ -4117,9 +4142,9 @@ fun WeatherOverlayEffect(weather: String) {
 
 fun getWeatherColor(weather: String): Color = when (weather) {
     "Quantum Storm" -> CyberMagenta
-    "Ice Comet Shower" -> CyberCyan
-    "Dense Nebula" -> CyberCyanDim
-    "Electromagnetic Interference" -> CyberAmber
+    "Ice Comet Shower" -> IceCometCyan
+    "Dense Nebula" -> NebulaViolet
+    "Electromagnetic Interference" -> EMIPlasma
     else -> Color.Transparent
 }
 
@@ -5303,7 +5328,6 @@ fun LivingShipEcosystemTab(state: GameUiState, viewModel: GameViewModel) {
 
 @Composable
 fun PlantVisualStem(progress: Int, species: String) {
-    val progressFloat = progress / 100f
     val color = when (species) {
         "Neon Lotus" -> CyberCyan
         "Vivid Fern" -> Color(0xFF10B981)
@@ -5311,53 +5335,43 @@ fun PlantVisualStem(progress: Int, species: String) {
         else -> CyberAmber
     }
 
+    // Sapling -> mature growth-stage art (VisualAssets/LivingUniverse_Progression.png,
+    // QE_DEC_013/014/015) replacing the old Canvas-drawn stem/leaf-dot stand-in.
+    val stageDrawable = when {
+        progress >= 100 -> R.drawable.img_plant_mature
+        progress >= 30 -> R.drawable.img_plant_sprout
+        else -> R.drawable.img_plant_seed
+    }
+
     Box(
         modifier = Modifier
             .size(50.dp)
             .background(CyberObsidian, RoundedCornerShape(4.dp))
             .border(1.dp, CyberBorder, RoundedCornerShape(4.dp)),
-        contentAlignment = Alignment.BottomCenter
+        contentAlignment = Alignment.Center
     ) {
-        Canvas(modifier = Modifier.fillMaxSize().padding(4.dp)) {
-            val stemHeight = size.height * progressFloat * 0.8f
-            
-            // Draw Stem
-            drawLine(
-                color = Color(0xFF047857),
-                start = Offset(size.width / 2, size.height),
-                end = Offset(size.width / 2, size.height - stemHeight),
-                strokeWidth = 4f
+        if (progress >= 100) {
+            // Species-tinted bloom glow behind the mature sprite
+            Box(
+                modifier = Modifier
+                    .size(38.dp)
+                    .background(
+                        Brush.radialGradient(
+                            colors = listOf(color.copy(alpha = 0.45f), Color.Transparent)
+                        ),
+                        CircleShape
+                    )
             )
-
-            // Draw Leaves if grown
-            if (progress >= 30) {
-                drawCircle(
-                    color = Color(0xFF059669),
-                    radius = 4f,
-                    center = Offset(size.width / 2 - 6f, size.height - stemHeight * 0.5f)
-                )
-                drawCircle(
-                    color = Color(0xFF059669),
-                    radius = 4f,
-                    center = Offset(size.width / 2 + 6f, size.height - stemHeight * 0.7f)
-                )
-            }
-
-            if (progress >= 100) {
-                // Fully grown flower head!
-                drawCircle(
-                    color = color,
-                    radius = 8f,
-                    center = Offset(size.width / 2, size.height - stemHeight)
-                )
-                // Draw glow halo
-                drawCircle(
-                    color = color.copy(alpha = 0.3f),
-                    radius = 14f,
-                    center = Offset(size.width / 2, size.height - stemHeight)
-                )
-            }
         }
+
+        Image(
+            painter = painterResource(id = stageDrawable),
+            contentDescription = "$species growth stage",
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(4.dp),
+            contentScale = ContentScale.Fit
+        )
     }
 }
 
