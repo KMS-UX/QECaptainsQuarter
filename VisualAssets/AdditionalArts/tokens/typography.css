@@ -1,0 +1,12 @@
+:root{
+--font-display:'Orbitron',sans-serif; /* headlines, titles, important data — all caps */
+--font-ui:'Share Tech Mono',monospace; /* body text, UI labels, menus ("Quantum Sans" substitute) */
+--text-hero:32px; --text-title:22px; --text-heading:16px; --text-label:13px; --text-body:14px; --text-small:12px; --text-micro:10px;
+--tracking-caps:0.14em; --tracking-wide:0.08em;
+--leading-tight:1.15; --leading-body:1.55;
+--weight-display-bold:700; --weight-display-black:800;
+}
+body{font-family:var(--font-ui);color:var(--text-body);background:var(--surface-page);font-size:var(--text-body);line-height:var(--leading-body)}
+h1,h2,h3{font-family:var(--font-display);text-transform:uppercase;letter-spacing:var(--tracking-caps);line-height:var(--leading-tight)}
+a{color:var(--teal);text-decoration:none}
+a:hover{color:var(--quantum-purple)}

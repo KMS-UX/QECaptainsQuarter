@@ -1,0 +1,27 @@
+<!-- @dsCard group="Components" viewport="760x440" name="quests · QuestCard / Tracker / Rewards" subtitle="Tier-coded cards, objective checklist, tracked-quest HUD, rewards & status" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../../styles.css"><style>body{margin:0;padding:18px;background:var(--surface-page)}#r{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script><script src="../../assets/data/content.js"></script></head><body><div id="r"></div>
+<script type="text/babel">
+const {QuestCard,ObjectiveList,QuestTracker,QuestRewards,QuestStatus,Panel}=window.QuantumEffectDesignSystem_2d830e;
+const ST=["available","in-progress","ready","completed","failed","untracked"];
+function Demo({quests}){
+ const main=quests.find(q=>q.id==='core-relay');
+ const tracked=quests.map(q=>({tier:q.tier,title:q.title,sub:q.objectives[0].text+(q.objectives[0].count?' ('+q.objectives[0].count+')':''),timer:q.timer,active:q.id==='core-relay'}));
+ return <>
+ <QuestCard tier={main.tier} title={main.title} image="../../assets/keyart-neosolis.png" description={main.description} objective={main.objectives[0].text} progress={0} progressMax={1} level={main.level} footer={main.region}/>
+ <div style={{display:'flex',flexDirection:'column',gap:12,flex:'none'}}>
+   <QuestTracker quests={tracked}/>
+   <div style={{display:'flex',flexDirection:'column',gap:5}}>{ST.map(s=><QuestStatus key={s} state={s}/>)}</div>
+ </div>
+ <div style={{display:'flex',flexDirection:'column',gap:12,flex:1,minWidth:220}}>
+   <ObjectiveList title="Active Objectives" items={main.objectives}/>
+   <Panel title="Rewards" accent="var(--atom-gold)"><QuestRewards xp={main.rewards.xp} reputation={main.rewards.reputation} currency={main.rewards.currency} items={main.rewards.items} choice={main.rewards.choice}/></Panel>
+ </div>
+</>;}
+QEContent.load('../../assets/data').then(({quests})=>{
+  ReactDOM.createRoot(document.getElementById('r')).render(<Demo quests={quests}/>);
+});
+</script></body></html>

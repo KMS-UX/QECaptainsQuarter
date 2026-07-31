@@ -1,0 +1,37 @@
+:root{
+/* Base surfaces — near-black blue-violet void */
+--void-0:#04060d; --void-1:#070b16; --void-2:#0b1020; --void-3:#101729; --void-4:#161f36;
+/* Foreground */
+--fg-1:#e8ecf4; --fg-2:#9aa6bd; --fg-3:#5d6a85; --fg-disabled:#3a4358;
+/* Accents (Art Bible "Accent Usage") */
+--quantum-purple:#a855f7; --quantum-purple-deep:#7c3aed; --quantum-purple-dim:#4c1d95;
+--teal:#2dd4cf; --teal-deep:#0e9e9a;
+--electric-blue:#4f83f7; --electric-blue-deep:#2b5cd9;
+--atom-gold:#f0b429; --atom-gold-deep:#c78a12;
+--alert-red:#e5484d; --alert-red-deep:#b02a30;
+--success-green:#7ede4e; --success-green-deep:#4ca82a;
+--ember-orange:#f07f2e;
+/* Semantic */
+--surface-page:var(--void-0); --surface-panel:var(--void-1); --surface-raised:var(--void-2); --surface-inset:#030509;
+--text-body:var(--fg-1); --text-muted:var(--fg-2); --text-faint:var(--fg-3);
+--text-heading:var(--atom-gold); --text-section:var(--teal); --text-brand:var(--quantum-purple);
+--border-panel:#1d2740; --border-bright:#2e3d63; --border-accent:var(--teal);
+--focus-ring:var(--teal);
+/* Stat bars */
+--bar-hp:#e5484d; --bar-hp-hi:#ff7a45; --bar-ep:#2b5cd9; --bar-ep-hi:#38c8f0; --bar-xp:#c78a12; --bar-xp-hi:#f0b429; --bar-track:#0a0e1a;
+/* Rarity scale (Inventory & Icon Bible) */
+--rarity-common:#9aa4b5; --rarity-uncommon:#7ede4e; --rarity-rare:#4f83f7; --rarity-epic:#a855f7; --rarity-legendary:#f0b429; --rarity-mythic:#e5484d; --rarity-exotic:#2dd4cf;
+/* Quest tiers (Quest & Mission Visual Language) */
+--quest-main:#4f83f7; --quest-side:#7ede4e; --quest-faction:#a855f7; --quest-world:#f0b429; --quest-daily:#2dd4cf; --quest-hidden:#8a93a8;
+/* Quantum elements (Starships & Elements §8) — element : rarity */
+--elem-quantium:#b06cf0; --elem-voidium:#7c6cf0; --elem-neutronite:#4f83f7; --elem-singularium:#f07f2e; --elem-phasium:#4fce8f; --elem-entropium:#e5487f; --elem-aeon:#f0b429;
+/* Quantum field hazard levels (§10) */
+--hazard-safe:#7ede4e; --hazard-caution:#f0b429; --hazard-danger:#f07f2e; --hazard-extreme:#e5484d; --hazard-unknown:#a855f7;
+/* Minimap markers (HUD & UI Kit §09) */
+--marker-player:#7ede4e; --marker-ally:#2dd4cf; --marker-enemy:#e5484d; --marker-objective:#f0b429; --marker-poi:#4f83f7;
+--map-fog:#05070d; --map-terrain:#0e1626; --map-terrain-hi:#17233b;
+/* Faction colors — original powers */
+--faction-aurelian:#f0b429; --faction-emberpact:#f07f2e; --faction-voidseekers:#a855f7; --faction-ironward:#8fa88a;
+/* Faction colors — emergent powers */
+--faction-eclipse:#b34fd6; --faction-horizon:#2fb6a8; --faction-curators:#d9a640; --faction-exile:#d64545; --faction-synthic:#8fce4f;
+}

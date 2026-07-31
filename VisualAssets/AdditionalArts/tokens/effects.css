@@ -1,0 +1,14 @@
+:root{
+--glow-purple:0 0 8px rgba(168,85,247,.55),0 0 24px rgba(168,85,247,.25);
+--glow-teal:0 0 8px rgba(45,212,207,.5),0 0 20px rgba(45,212,207,.22);
+--glow-gold:0 0 8px rgba(240,180,41,.5),0 0 20px rgba(240,180,41,.22);
+--glow-red:0 0 8px rgba(229,72,77,.55),0 0 20px rgba(229,72,77,.25);
+--shadow-panel:0 2px 0 rgba(0,0,0,.6),0 12px 32px rgba(0,0,0,.5);
+--inset-panel:inset 0 1px 0 rgba(255,255,255,.04),inset 0 0 24px rgba(0,0,0,.45);
+--scanline:repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0 1px,transparent 1px 3px); /* @kind other */
+--panel-gradient:linear-gradient(180deg,rgba(255,255,255,.03),rgba(0,0,0,.25)); /* @kind other */
+--ease-ui:cubic-bezier(.2,.9,.3,1); /* @kind other */ --dur-fast:0.15s; /* @kind other */ --dur-base:0.25s; /* @kind other */ /* 0.15–0.3s per kit notes */
+--dur-instant:0.08s; /* @kind other */ --dur-slow:0.4s; /* @kind other */ --dur-slower:0.7s; /* @kind other */
+--ease-out:cubic-bezier(.16,1,.3,1); /* @kind other */ --ease-in:cubic-bezier(.5,0,.75,0); /* @kind other */ --ease-emphasized:cubic-bezier(.34,1.56,.64,1); /* @kind other */ --ease-linear:linear; /* @kind other */ /* ease-emphasized = overshoot for pops/pickups */
+--overlay-dim:rgba(4,6,13,.78);
+}

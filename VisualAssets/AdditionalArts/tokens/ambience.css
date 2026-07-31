@@ -1,0 +1,12 @@
+/* Ambience palettes — sampled from the Environment & Ambience reference sheet.
+   Each biome/mood has a deep base, a mid tone, and a bright accent for lighting/overlays. */
+:root{
+  --amb-neon-night-base:#0c132a; --amb-neon-night-mid:#1b244f; --amb-neon-night-accent:#521e91;
+  --amb-toxic-base:#131c14; --amb-toxic-mid:#384e29; --amb-toxic-accent:#667d2c;
+  --amb-desert-base:#52321d; --amb-desert-mid:#815630; --amb-desert-accent:#9f6333;
+  --amb-arctic-base:#143551; --amb-arctic-mid:#34556f; --amb-arctic-accent:#476a7d;
+  --amb-void-base:#200e3b; --amb-void-mid:#37146b; --amb-void-accent:#61269c;
+  --amb-overgrown-base:#233017; --amb-overgrown-mid:#435921; --amb-overgrown-accent:#475928;
+  --amb-space-base:#06101a; --amb-space-mid:#12243e; --amb-space-accent:#233f6b;
+  --amb-anomaly-base:#2c1d4d; --amb-anomaly-mid:#462377; --amb-anomaly-accent:#b031b5;
+}
