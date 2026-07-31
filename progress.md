@@ -4,7 +4,7 @@ Living document for tracking the ship-immersion redesign initiative. See
 `Quantum Effect Captain's Quarters Build Bible.txt` for the full design vision;
 this file tracks *implementation* status against it.
 
-Last updated: 2026-07-31 (session 4)
+Last updated: 2026-07-31 (session 5)
 
 ## Current initiative: "Dynamic wallpaper" starship
 
@@ -50,6 +50,8 @@ the local proxy); verification was manual review plus a brace/paren/bracket
 balance script, matching the process documented below. Watch the `Build
 Android APK` GitHub Actions workflow after this branch merges.
 
+| 7 | (unmerged, this branch) | **Display Shelf** (Build Bible: "Player achievements. Alien artifacts. Models. Photographs. Crew gifts."), the one item from session 4's "suggested next session" list that had no prior implementation. Session start also confirmed PR #4/#5/#6 had *already* been merged directly to `main` outside the PR flow (the PRs themselves show `merged:false`/`closed` on GitHub, but `main`'s HEAD matches this branch's pre-session commit exactly) — that suggested-next-session item is done, nothing to merge. New work this session: added `CabinetNode.DISPLAY_SHELF`, a Canvas-drawn `DisplayCabinetObject` physical hotspot (glass case, glowing medals/curio silhouette — same vector-prop treatment as every other Captain's Quarters hotspot, not a raster sprite) placed at x=1140dp between the Bookshelf (1020dp) and Elevator (now 1250dp, shifted right from 1200dp to make room — checked the shift keeps the elevator's 110dp-wide column within the 1380dp panorama, since the old 1200dp start already left only 180dp of margin), and a `DisplayShelfPanel` with 3 tabs. Rather than inventing a fake achievements database, **Mementos** are 8 milestones computed live from state that already exists and only grows (companion affinity, plant growth, completed research, placed decorations, log count, calendar day) — no new persisted schema. **Gifts** scans each companion's existing `chatHistory` for "Replicated and presented gift:" messages (already logged by `replicateCompanionGift`, just never surfaced anywhere) and shows what's been given per companion, with an honest "nothing presented yet" empty state if none have. **Curios** (alien artifacts/models/photographs) has no underlying collection mechanic in the game at all, so it's an honest "ARTIFACT BAY: EMPTY" placeholder rather than fabricated content — a real feature would need its own next session. Also cropped `QE_FUR_010_DisplayCabinet` from `QE_FUR_CON.png` into `img_icon_display_shelf.png` (same chroma-key-by-brightness/saturation approach as session 4's icon crops) for the panel header banner, following the `PanelIconBanner` pattern from Bookshelf/Coffee Corner. Along the way, confirmed `DecorationState`/`purchaseDecoration`/`toggleDecoration` (the Build Bible's separate "Personal Decorations" bullet, right after Display Shelf) already exists and is already surfaced — it's tab index 2 ("IV. COZY QUARTERS ORNAMENTS") inside `LivingShipEcosystemTab`, reached from the Captain's Desk panel — so it needed no new work, just confirmation it wasn't being duplicated. |
+
 ### VisualAssets inventory — what's usable vs. reference-only
 
 The full `VisualAssets/` folder (19 PNGs + a placeholder note) is now on
@@ -67,11 +69,12 @@ current game and needs a deliberate decision before use:
   - `LivingUniverse_Progression.png` — cropped `QE_DEC_013/014/015` into
     `img_plant_seed/sprout/mature.png`, swapped into `PlantVisualStem`.
   - `QE_FUR_CON.png` — cropped `QE_FUR_001_CaptainDesk`, `QE_CON_004_AICoreConsole`,
-    and `QE_FUR_011_Bookshelf` into `img_icon_captain_desk/ai_core/bookshelf.png`,
-    used as panel-header icons/banners. `QE_FUR_010_DisplayCabinet`,
-    `QE_CON_010_HolographicDisplay`, and `QE_CON_014_StellarArchive` are
-    cropped-quality-verified but still unused — good candidates if the
-    Display Shelf section (Build Bible) or a Bookshelf sub-tab gets built out.
+    `QE_FUR_011_Bookshelf` into `img_icon_captain_desk/ai_core/bookshelf.png`,
+    and (session 5) `QE_FUR_010_DisplayCabinet` into `img_icon_display_shelf.png`,
+    used as panel-header icons/banners. `QE_CON_010_HolographicDisplay` and
+    `QE_CON_014_StellarArchive` are still cropped-quality-verified but unused —
+    good candidates for a Bookshelf sub-tab, or the Curios tab once it has a
+    real collection mechanic (see Suggested next session).
   - `CoffeeBrewingCycle.png` — used only the final "ready" frame (glowing cyan
     outline, no visible brew animation) as a static header icon
     (`img_icon_coffee_brewer.png`) for the Coffee Corner *detail panel*, not
@@ -155,8 +158,16 @@ current game and needs a deliberate decision before use:
 - **Panel header icons**: `InteractivePanelContainer` takes an optional
   `iconRes: Int?` (session 4) shown in place of the plain color dot; wired via
   `getPanelIcon(CabinetNode): Int?` right next to `getPanelTitle`. Currently
-  only DESK/AI/COFFEE/BOOKSHELF have an icon — add a case there (plus crop a
-  matching PNG into `res/drawable/`) to extend to other nodes.
+  DESK/AI/COFFEE/BOOKSHELF/DISPLAY_SHELF have an icon — add a case there (plus
+  crop a matching PNG into `res/drawable/`) to extend to other nodes.
+- **Captain's Quarters hotspot spacing is now tight.** All 7 physical props
+  (window/AI/desk/coffee/bookshelf/display-shelf/elevator) share the same
+  1380dp panorama width; gaps shrink from 260dp near the window down to ~10dp
+  by the display shelf/elevator (session 5 added the display shelf between
+  bookshelf and elevator, and narrowed its own footprint to 90dp to make the
+  math work — see `DisplayCabinetObject`). Adding an 8th prop to this deck
+  without widening the panorama or removing something else will very likely
+  start actually overlapping objects, not just crowding them.
 - **No local Android SDK in the sandbox this work was done in** — could not run
   `gradle assembleDebug` locally (AGP version doesn't resolve through the local
   proxy). Verification for each PR was: careful manual review of every changed
@@ -167,28 +178,52 @@ current game and needs a deliberate decision before use:
 ## Suggested next session
 
 All 4 decks now have the spatial pass, a real painted background, weather
-overlay art, plant growth sprites, per-companion quarters decor, and polished
-detail panels — the presentation/interaction-layer initiative from this
-document's original goal is essentially feature-complete for the 4 existing
-decks. Good next candidates:
-1. **Merge PR #4/#5/#6** (Greenhouse spatial pass, deck backgrounds, and this
-   session's weather/plant/companion-rooms/panel-polish work) if not already
-   merged, and confirm `Build Android APK` is green on `main` afterward.
-2. **Display Shelf section** (Build Bible: "Player achievements, alien
-   artifacts, models, photographs, crew gifts") doesn't exist as a panel yet.
-   `QE_FUR_010_DisplayCabinet` (`QE_FUR_CON.png`, cropped/quality-checked this
-   session but unused — see VisualAssets inventory) and
-   `QE_INF_018_TrophyCase` (`LivingUniverse_Progression.png`, not yet cropped)
-   are a ready-made seed for it.
+overlay art, plant growth sprites, per-companion quarters decor, polished
+detail panels, and a Display Shelf — the presentation/interaction-layer
+initiative from this document's original goal is feature-complete for the 4
+existing decks against everything in the Build Bible's "Captain's Quarters"
+section. Good next candidates:
+1. **Confirm `Build Android APK` is green on `main`** after this branch's
+   Display Shelf work lands — check the workflow run for this branch's HEAD
+   commit specifically (there's a backlog of runs from the bulk-upload
+   commits at session start; several were still `in_progress`/queued when
+   this session began).
+2. **Curios tab has no data behind it.** `DisplayShelfPanel`'s CURIOS tab
+   (alien artifacts/models/photographs) is an honest empty-state placeholder
+   — there's no collection mechanic anywhere in `GameViewModel` for the
+   player to find/earn artifacts. Building that out for real would mean: (a)
+   a new persisted list (id/name/description/imageRes, mirroring
+   `DecorationState`'s shape), and (b) *some* in-fiction way to earn entries
+   (an exploration/sector-scan reward off `SectorState`? a rare research
+   payout? a companion affinity milestone gift?) — needs a product decision
+   on the earning mechanic before writing code, not just a UI pass.
+   `QE_INF_018_TrophyCase` (`LivingUniverse_Progression.png`, not yet
+   cropped) and the still-unused `QE_CON_010_HolographicDisplay`/
+   `QE_CON_014_StellarArchive` crops (`QE_FUR_CON.png`, cropped/
+   quality-checked in session 4 — see VisualAssets inventory) are ready-made
+   art seeds once the mechanic is decided.
 3. **Phase 2+ Build Bible systems** — nothing done yet on Daily Briefing
    content depth, Quantum Resonance Forecast, crew schedules/relationships
    beyond the existing affinity system, or the trade/galaxy simulation. These
    are gameplay/data-model work, not presentation — a different kind of
-   session than the last 4.
+   session than the last 5.
 4. If more painted companion-room art ever gets added (see `CrewSystem.png`/
    `QE_CREW_INTER.png` note above — needs a product decision on a 5th
    companion or a re-skin first), swap it in for session 4's procedural
    `CompanionQuartersDecor` Canvas backdrops.
+
+## Correction for future sessions: PR merge state is unreliable
+
+Session 5 discovered that GitHub's PR list for this repo shows PRs #4/#5/#6
+as `merged: false` / `state: closed` — but `main`'s actual HEAD commit
+already contained all of that work byte-for-byte (confirmed via
+`get_file_contents`/`list_commits` against `refs/heads/main`, not the local
+`origin/main` tracking ref, which was stale until an explicit
+`git fetch origin +refs/heads/main:refs/remotes/origin/main` — a plain
+`git fetch origin main` silently no-opped in this sandbox). **Don't trust
+this progress.md's "not yet opened/merged" notes about PR state at face
+value** — always check `main`'s real HEAD content/commit log directly before
+assuming something needs merging.
 
 No local Android SDK in this sandbox either — same verification method as
 prior sessions: careful manual review of Compose API usage (brace/paren
