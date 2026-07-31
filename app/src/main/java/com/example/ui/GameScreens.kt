@@ -7,6 +7,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -16,6 +17,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -927,7 +929,8 @@ fun CabinView(state: GameUiState, viewModel: GameViewModel) {
         ) {
             InteractivePanelContainer(
                 title = getPanelTitle(state.activeNode),
-                onClose = { viewModel.setNode(CabinetNode.NONE) }
+                onClose = { viewModel.setNode(CabinetNode.NONE) },
+                iconRes = getPanelIcon(state.activeNode)
             ) {
                 when (state.activeNode) {
                     CabinetNode.WINDOW -> ObservationWindowPanel(state, viewModel)
@@ -1907,6 +1910,7 @@ fun HotspotNode(
 fun InteractivePanelContainer(
     title: String,
     onClose: () -> Unit,
+    iconRes: Int? = null,
     content: @Composable () -> Unit
 ) {
     Box(
@@ -1947,12 +1951,21 @@ fun InteractivePanelContainer(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            modifier = Modifier
-                                .size(10.dp)
-                                .clip(RoundedCornerShape(5.dp))
-                                .background(CyberCyan)
-                        )
+                        if (iconRes != null) {
+                            Image(
+                                painter = painterResource(id = iconRes),
+                                contentDescription = null,
+                                modifier = Modifier.size(28.dp),
+                                contentScale = ContentScale.Fit
+                            )
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .size(10.dp)
+                                    .clip(RoundedCornerShape(5.dp))
+                                    .background(CyberCyan)
+                            )
+                        }
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = title,
@@ -2012,6 +2025,69 @@ fun getPanelTitle(node: CabinetNode): String = when (node) {
     CabinetNode.PET_SANCTUARY -> "CYBER-PET FIRMWARE HARNESS"
     CabinetNode.ELEVATOR -> "QUANTUM TRANSIT LIFT"
     else -> "STARSHIP SYSTEM"
+}
+
+/** Reference-sheet icon (VisualAssets/QE_FUR_CON.png, CoffeeBrewingCycle.png) shown in the panel header, where one exists. */
+fun getPanelIcon(node: CabinetNode): Int? = when (node) {
+    CabinetNode.DESK -> R.drawable.img_icon_captain_desk
+    CabinetNode.AI -> R.drawable.img_icon_ai_core
+    CabinetNode.COFFEE -> R.drawable.img_icon_coffee_brewer
+    CabinetNode.BOOKSHELF -> R.drawable.img_icon_bookshelf
+    else -> null
+}
+
+/** Small furniture/console-icon banner used to give a detail panel a distinct visual identity. */
+@Composable
+fun PanelIconBanner(iconRes: Int, title: String, subtitle: String, accentColor: Color) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 12.dp)
+            .background(
+                Brush.horizontalGradient(listOf(accentColor.copy(alpha = 0.14f), Color.Transparent)),
+                RoundedCornerShape(8.dp)
+            )
+            .border(1.dp, accentColor.copy(alpha = 0.4f), RoundedCornerShape(8.dp))
+            .padding(10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(56.dp)
+                .background(CyberObsidian, RoundedCornerShape(6.dp))
+                .border(1.dp, accentColor.copy(alpha = 0.5f), RoundedCornerShape(6.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(id = iconRes),
+                contentDescription = title,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(6.dp),
+                contentScale = ContentScale.Fit
+            )
+        }
+        Spacer(modifier = Modifier.width(12.dp))
+        Column {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleSmall.copy(
+                    color = accentColor,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.Monospace,
+                    letterSpacing = 1.sp
+                )
+            )
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.labelSmall.copy(
+                    color = Color.Gray,
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 9.sp
+                )
+            )
+        }
+    }
 }
 
 // --- 6. OBSERVATION WINDOW DETAILED PANEL ---
@@ -2171,15 +2247,24 @@ fun CaptainDeskPanel(state: GameUiState, viewModel: GameViewModel) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "DAILY BRIEFING TERMINAL // DAY ${state.calendarDay}",
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            color = CyberAmber,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = FontFamily.Monospace,
-                            letterSpacing = 1.sp
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Image(
+                            painter = painterResource(id = R.drawable.img_icon_captain_desk),
+                            contentDescription = null,
+                            modifier = Modifier.size(26.dp),
+                            contentScale = ContentScale.Fit
                         )
-                    )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "DAILY BRIEFING TERMINAL // DAY ${state.calendarDay}",
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                color = CyberAmber,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = FontFamily.Monospace,
+                                letterSpacing = 1.sp
+                            )
+                        )
+                    }
                     Box(
                         modifier = Modifier
                             .background(CyberCyan.copy(alpha = 0.15f), RoundedCornerShape(4.dp))
@@ -3522,6 +3607,16 @@ fun AiTerminalPanel(state: GameUiState, viewModel: GameViewModel) {
                         )
                     )
                 }
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                // AI Core Console icon (VisualAssets/QE_FUR_CON.png, QE_CON_004_AICoreConsole)
+                Image(
+                    painter = painterResource(id = R.drawable.img_icon_ai_core),
+                    contentDescription = "AI Core Console",
+                    modifier = Modifier.size(40.dp).alpha(0.85f),
+                    contentScale = ContentScale.Fit
+                )
             }
         }
 
@@ -3719,6 +3814,13 @@ fun CoffeeCornerPanel(state: GameUiState, viewModel: GameViewModel) {
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
+        PanelIconBanner(
+            iconRes = R.drawable.img_icon_coffee_brewer,
+            title = "REPLICATOR & BREWING BAY",
+            subtitle = "Molecular synthesis online // select a formula below",
+            accentColor = CyberMagenta
+        )
+
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -3851,6 +3953,13 @@ fun BookshelfPanel(state: GameUiState, viewModel: GameViewModel) {
     var selectedCategory by remember { mutableStateOf(0) } // 0 = Factions, 1 = Systems, 2 = anomalies
 
     Column(modifier = Modifier.fillMaxSize()) {
+        PanelIconBanner(
+            iconRes = R.drawable.img_icon_bookshelf,
+            title = "STELLAR ENCYCLOPEDIA CODEX",
+            subtitle = "Archived factions, systems & anomaly records",
+            accentColor = CyberCyanDim
+        )
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -4018,6 +4127,18 @@ fun WeatherOverlayEffect(weather: String) {
                 label = "comets"
             )
 
+            // Painted ice-comet-shower texture (VisualAssets/WeatherOverlay.png,
+            // QE_FX_003_WeatherEffect_Ice) as the atmospheric backdrop, with the
+            // animated cyan comets from below streaking across it.
+            Image(
+                painter = painterResource(id = R.drawable.img_weather_ice),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .alpha(0.4f),
+                contentScale = ContentScale.Crop
+            )
+
             Canvas(modifier = Modifier.fillMaxSize()) {
                 val rand = java.util.Random(111)
                 for (i in 0..8) {
@@ -4052,24 +4173,23 @@ fun WeatherOverlayEffect(weather: String) {
                 label = "nebula"
             )
 
+            // Painted nebula-drift texture (VisualAssets/WeatherOverlay.png,
+            // QE_ANI_005_NebulaShift) breathing in and out in place of the old
+            // flat gradient blobs.
+            Image(
+                painter = painterResource(id = R.drawable.img_weather_nebula),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .alpha(pulse),
+                contentScale = ContentScale.Crop
+            )
+
             Canvas(modifier = Modifier.fillMaxSize()) {
                 drawCircle(
                     brush = Brush.radialGradient(
                         colors = listOf(
-                            CyberCyanDim.copy(alpha = pulse),
-                            CyberObsidian.copy(alpha = 0f)
-                        ),
-                        center = Offset(size.width * 0.7f, size.height * 0.3f),
-                        radius = size.width * 0.8f
-                    ),
-                    radius = size.width * 0.8f,
-                    center = Offset(size.width * 0.7f, size.height * 0.3f)
-                )
-
-                drawCircle(
-                    brush = Brush.radialGradient(
-                        colors = listOf(
-                            CyberMagenta.copy(alpha = pulse * 0.6f),
+                            CyberMagenta.copy(alpha = pulse * 0.3f),
                             CyberObsidian.copy(alpha = 0f)
                         ),
                         center = Offset(size.width * 0.2f, size.height * 0.8f),
@@ -4089,6 +4209,18 @@ fun WeatherOverlayEffect(weather: String) {
                     repeatMode = RepeatMode.Reverse
                 ),
                 label = "interference"
+            )
+
+            // Painted EMI-glitch texture (VisualAssets/WeatherOverlay.png,
+            // QE_FX_004_WeatherEffect_EMI) flashes brighter in sync with the
+            // scanline flicker below instead of staying at a constant alpha.
+            Image(
+                painter = painterResource(id = R.drawable.img_weather_emi),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .alpha(if (trigger > 0.82f) 0.35f else 0.1f),
+                contentScale = ContentScale.Crop
             )
 
             Canvas(modifier = Modifier.fillMaxSize()) {
@@ -4117,9 +4249,9 @@ fun WeatherOverlayEffect(weather: String) {
 
 fun getWeatherColor(weather: String): Color = when (weather) {
     "Quantum Storm" -> CyberMagenta
-    "Ice Comet Shower" -> CyberCyan
-    "Dense Nebula" -> CyberCyanDim
-    "Electromagnetic Interference" -> CyberAmber
+    "Ice Comet Shower" -> IceCometCyan
+    "Dense Nebula" -> NebulaViolet
+    "Electromagnetic Interference" -> EMIPlasma
     else -> Color.Transparent
 }
 
@@ -4392,6 +4524,160 @@ fun CrewRegistryTab(state: GameUiState, viewModel: GameViewModel) {
     }
 }
 
+/** Human-readable theme name for each companion's personal quarters, shown under their name. */
+fun companionQuartersLabel(companionId: String): String = when (companionId) {
+    "lyra" -> "SNIPER'S NEST"
+    "nova" -> "HACKER DEN"
+    "elara" -> "BIO SANCTUARY"
+    "quark" -> "ANDROID ALCOVE"
+    else -> "PERSONAL QUARTERS"
+}
+
+/**
+ * Procedural Canvas decor that makes each companion's quarters visually distinct,
+ * keyed off their id/colorHex since no per-companion painted room art exists yet
+ * (see progress.md). Drawn as a faint backdrop layer behind the chat UI.
+ */
+@Composable
+fun CompanionQuartersDecor(companionId: String, accentColor: Color) {
+    Canvas(modifier = Modifier.fillMaxSize()) {
+        val w = size.width
+        val h = size.height
+        when (companionId) {
+            "lyra" -> {
+                // Sniper's nest: scope reticle + angled tactical stripes + an ammo crate
+                val reticle = Offset(w * 0.82f, h * 0.14f)
+                listOf(70f, 46f, 22f).forEach { r ->
+                    drawCircle(
+                        color = accentColor.copy(alpha = 0.14f),
+                        radius = r,
+                        center = reticle,
+                        style = Stroke(width = 1.5f)
+                    )
+                }
+                drawLine(
+                    color = accentColor.copy(alpha = 0.14f),
+                    start = Offset(reticle.x - 90f, reticle.y),
+                    end = Offset(reticle.x + 90f, reticle.y),
+                    strokeWidth = 1.5f
+                )
+                drawLine(
+                    color = accentColor.copy(alpha = 0.14f),
+                    start = Offset(reticle.x, reticle.y - 90f),
+                    end = Offset(reticle.x, reticle.y + 90f),
+                    strokeWidth = 1.5f
+                )
+
+                for (i in 0..4) {
+                    val offset = i * 26f
+                    drawLine(
+                        color = accentColor.copy(alpha = 0.07f),
+                        start = Offset(-20f + offset, h),
+                        end = Offset(60f + offset, h - 140f),
+                        strokeWidth = 10f
+                    )
+                }
+
+                drawRoundRect(
+                    color = Color(0xFF1A1420).copy(alpha = 0.5f),
+                    topLeft = Offset(10f, h - 60f),
+                    size = androidx.compose.ui.geometry.Size(70f, 50f),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(4f),
+                    style = Stroke(width = 2f)
+                )
+            }
+            "nova" -> {
+                // Hacker den: falling data-stream columns + a terminal-frame accent
+                val rand = java.util.Random(42)
+                val cols = 10
+                for (c in 0 until cols) {
+                    val x = w * (c + 0.5f) / cols
+                    val streamLen = rand.nextInt(4) + 3
+                    var y = rand.nextFloat() * h
+                    for (s in 0 until streamLen) {
+                        drawRoundRect(
+                            color = accentColor.copy(alpha = (0.12f - s * 0.018f).coerceAtLeast(0.02f)),
+                            topLeft = Offset(x - 3f, y),
+                            size = androidx.compose.ui.geometry.Size(6f, 14f),
+                            cornerRadius = androidx.compose.ui.geometry.CornerRadius(1f)
+                        )
+                        y -= 22f
+                        if (y < 0) y += h
+                    }
+                }
+                drawRect(
+                    color = accentColor.copy(alpha = 0.16f),
+                    topLeft = Offset(w - 96f, 16f),
+                    size = androidx.compose.ui.geometry.Size(80f, 56f),
+                    style = Stroke(width = 1.5f)
+                )
+            }
+            "elara" -> {
+                // Bio sanctuary: climbing vine tendrils with small leaves
+                val vineLeft = Path().apply {
+                    moveTo(0f, h)
+                    quadraticTo(w * 0.05f, h * 0.7f, w * 0.14f, h * 0.55f)
+                    quadraticTo(w * 0.2f, h * 0.42f, w * 0.1f, h * 0.28f)
+                }
+                drawPath(vineLeft, color = accentColor.copy(alpha = 0.2f), style = Stroke(width = 3f, cap = StrokeCap.Round))
+
+                val vineRight = Path().apply {
+                    moveTo(w, h)
+                    quadraticTo(w * 0.92f, h * 0.65f, w * 0.82f, h * 0.5f)
+                }
+                drawPath(vineRight, color = accentColor.copy(alpha = 0.2f), style = Stroke(width = 3f, cap = StrokeCap.Round))
+
+                listOf(
+                    Offset(w * 0.12f, h * 0.5f),
+                    Offset(w * 0.18f, h * 0.36f),
+                    Offset(w * 0.86f, h * 0.56f),
+                    Offset(w * 0.9f, h * 0.44f)
+                ).forEach { leaf ->
+                    drawOval(
+                        color = accentColor.copy(alpha = 0.18f),
+                        topLeft = Offset(leaf.x - 8f, leaf.y - 4f),
+                        size = androidx.compose.ui.geometry.Size(16f, 8f)
+                    )
+                }
+            }
+            "quark" -> {
+                // Android alcove: circuit-trace grid with glowing solder-point nodes
+                var y = 30f
+                while (y < h) {
+                    drawLine(
+                        color = accentColor.copy(alpha = 0.08f),
+                        start = Offset(0f, y),
+                        end = Offset(w, y),
+                        strokeWidth = 1f
+                    )
+                    y += 46f
+                }
+                val rand = java.util.Random(7)
+                for (i in 0 until 14) {
+                    drawCircle(
+                        color = accentColor.copy(alpha = 0.28f),
+                        radius = 2.5f,
+                        center = Offset(rand.nextFloat() * w, rand.nextFloat() * h)
+                    )
+                }
+                val hex = Path().apply {
+                    val cx = w * 0.85f
+                    val cy = h * 0.14f
+                    val r = 30f
+                    for (i in 0..6) {
+                        val angle = Math.toRadians((60 * i - 30).toDouble())
+                        val px = cx + r * Math.cos(angle).toFloat()
+                        val py = cy + r * Math.sin(angle).toFloat()
+                        if (i == 0) moveTo(px, py) else lineTo(px, py)
+                    }
+                    close()
+                }
+                drawPath(hex, color = accentColor.copy(alpha = 0.22f), style = Stroke(width = 1.5f))
+            }
+        }
+    }
+}
+
 @Composable
 fun CompanionDetailScreen(companion: CompanionState, state: GameUiState, viewModel: GameViewModel) {
     val compColor = parseHexColor(companion.colorHex)
@@ -4405,168 +4691,192 @@ fun CompanionDetailScreen(companion: CompanionState, state: GameUiState, viewMod
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        // Header
-        Row(
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Personal quarters backdrop - distinct decor per companion so each
+        // door leads somewhere that visually feels like *their* room.
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = { viewModel.selectCompanionChat(null) }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    tint = Color.LightGray
-                )
-            }
-            Spacer(modifier = Modifier.width(4.dp))
-            Column {
-                Text(
-                    text = "${companion.name.uppercase()} // ACTIVE CONNECTION",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        color = compColor,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = FontFamily.Monospace
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(compColor.copy(alpha = 0.12f), CyberObsidian)
                     )
                 )
-                Text(
-                    text = "${getAffinityTierName(companion.affinity).uppercase()} // AFFINITY LEVEL ${companion.affinity}/5",
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        color = Color.Gray,
-                        fontFamily = FontFamily.Monospace
-                    )
-                )
-            }
-        }
+        )
+        CompanionQuartersDecor(companionId = companion.id, accentColor = compColor)
 
-        LazyColumn(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .background(CyberSteel.copy(alpha = 0.3f), CutCornerShape(8.dp))
-                .border(1.dp, CyberBorder, CutCornerShape(8.dp))
-                .padding(10.dp),
-            state = chatState,
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            // Bio/Summary card inside chat
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = CyberPanel.copy(alpha = 0.5f))
-                ) {
-                    Column(modifier = Modifier.padding(10.dp)) {
-                        Text(
-                            text = companion.bio,
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                color = Color.LightGray,
-                                fontFamily = FontFamily.SansSerif
-                            )
+        Column(modifier = Modifier.fillMaxSize()) {
+            // Header
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = { viewModel.selectCompanionChat(null) }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = Color.LightGray
+                    )
+                }
+                Spacer(modifier = Modifier.width(4.dp))
+                Column {
+                    Text(
+                        text = "${companion.name.uppercase()} // ACTIVE CONNECTION",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            color = compColor,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = FontFamily.Monospace
                         )
-                        Spacer(modifier = Modifier.height(6.dp))
-                        Text(
-                            text = "EQUIPPED: ${companion.weapon}",
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                color = compColor,
-                                fontFamily = FontFamily.Monospace,
-                                fontSize = 9.sp
-                            )
+                    )
+                    Text(
+                        text = "${getAffinityTierName(companion.affinity).uppercase()} // AFFINITY LEVEL ${companion.affinity}/5",
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            color = Color.Gray,
+                            fontFamily = FontFamily.Monospace
                         )
-                    }
+                    )
+                    Text(
+                        text = companionQuartersLabel(companion.id),
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            color = compColor.copy(alpha = 0.7f),
+                            fontFamily = FontFamily.Monospace,
+                            fontSize = 9.sp,
+                            letterSpacing = 1.sp
+                        )
+                    )
                 }
             }
 
-            // Real responsive chat messages
-            items(companion.chatHistory) { msg ->
-                val isCaptain = msg.sender == state.captainName
-                val alignment = if (isCaptain) Alignment.End else Alignment.Start
-                val bubbleColor = if (isCaptain) CyberCyan.copy(alpha = 0.1f) else compColor.copy(alpha = 0.1f)
-                val borderCol = if (isCaptain) CyberCyan.copy(alpha = 0.3f) else compColor.copy(alpha = 0.3f)
-                val textCol = if (isCaptain) Color.White else Color.White
-
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = alignment
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth(0.85f)
-                            .background(bubbleColor, RoundedCornerShape(8.dp))
-                            .border(1.dp, borderCol, RoundedCornerShape(8.dp))
-                            .padding(10.dp)
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .background(CyberSteel.copy(alpha = 0.3f), CutCornerShape(8.dp))
+                    .border(1.dp, CyberBorder, CutCornerShape(8.dp))
+                    .padding(10.dp),
+                state = chatState,
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                // Bio/Summary card inside chat
+                item {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = CyberPanel.copy(alpha = 0.5f))
                     ) {
-                        Column {
+                        Column(modifier = Modifier.padding(10.dp)) {
                             Text(
-                                text = msg.sender.uppercase(),
-                                style = MaterialTheme.typography.labelSmall.copy(
-                                    color = if (isCaptain) CyberCyan else compColor,
-                                    fontWeight = FontWeight.Bold,
-                                    fontFamily = FontFamily.Monospace,
-                                    fontSize = 8.sp
+                                text = companion.bio,
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    color = Color.LightGray,
+                                    fontFamily = FontFamily.SansSerif
                                 )
                             )
-                            Spacer(modifier = Modifier.height(2.dp))
+                            Spacer(modifier = Modifier.height(6.dp))
                             Text(
-                                text = msg.text,
-                                style = MaterialTheme.typography.bodySmall.copy(
-                                    color = textCol,
-                                    lineHeight = 14.sp
+                                text = "EQUIPPED: ${companion.weapon}",
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    color = compColor,
+                                    fontFamily = FontFamily.Monospace,
+                                    fontSize = 9.sp
                                 )
                             )
                         }
                     }
                 }
-            }
 
-            // Interactive response choices
-            val lastMsg = companion.chatHistory.lastOrNull()
-            if (lastMsg != null && lastMsg.responseOptions.isNotEmpty()) {
-                item {
+                // Real responsive chat messages
+                items(companion.chatHistory) { msg ->
+                    val isCaptain = msg.sender == state.captainName
+                    val alignment = if (isCaptain) Alignment.End else Alignment.Start
+                    val bubbleColor = if (isCaptain) CyberCyan.copy(alpha = 0.1f) else compColor.copy(alpha = 0.1f)
+                    val borderCol = if (isCaptain) CyberCyan.copy(alpha = 0.3f) else compColor.copy(alpha = 0.3f)
+                    val textCol = if (isCaptain) Color.White else Color.White
+
                     Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = alignment
                     ) {
-                        Text(
-                            text = "ESTABLISH DECISION MATRIX PROTOCOL",
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                color = CyberAmber,
-                                fontWeight = FontWeight.Bold,
-                                fontFamily = FontFamily.Monospace,
-                                fontSize = 9.sp
-                            )
-                        )
-                        lastMsg.responseOptions.forEach { option ->
-                            Button(
-                                onClick = { viewModel.sendCompanionResponse(companion.id, option) },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .border(1.dp, compColor, CutCornerShape(4.dp)),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = compColor.copy(alpha = 0.08f),
-                                    contentColor = compColor
-                                ),
-                                shape = CutCornerShape(4.dp),
-                                contentPadding = PaddingValues(10.dp)
-                            ) {
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Text(
-                                        text = option.text,
-                                        fontFamily = FontFamily.Monospace,
-                                        fontSize = 11.sp,
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(0.85f)
+                                .background(bubbleColor, RoundedCornerShape(8.dp))
+                                .border(1.dp, borderCol, RoundedCornerShape(8.dp))
+                                .padding(10.dp)
+                        ) {
+                            Column {
+                                Text(
+                                    text = msg.sender.uppercase(),
+                                    style = MaterialTheme.typography.labelSmall.copy(
+                                        color = if (isCaptain) CyberCyan else compColor,
                                         fontWeight = FontWeight.Bold,
-                                        textAlign = TextAlign.Center
+                                        fontFamily = FontFamily.Monospace,
+                                        fontSize = 8.sp
                                     )
-                                    if (option.costCredits != 0) {
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = msg.text,
+                                    style = MaterialTheme.typography.bodySmall.copy(
+                                        color = textCol,
+                                        lineHeight = 14.sp
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // Interactive response choices
+                val lastMsg = companion.chatHistory.lastOrNull()
+                if (lastMsg != null && lastMsg.responseOptions.isNotEmpty()) {
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "ESTABLISH DECISION MATRIX PROTOCOL",
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    color = CyberAmber,
+                                    fontWeight = FontWeight.Bold,
+                                    fontFamily = FontFamily.Monospace,
+                                    fontSize = 9.sp
+                                )
+                            )
+                            lastMsg.responseOptions.forEach { option ->
+                                Button(
+                                    onClick = { viewModel.sendCompanionResponse(companion.id, option) },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .border(1.dp, compColor, CutCornerShape(4.dp)),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = compColor.copy(alpha = 0.08f),
+                                        contentColor = compColor
+                                    ),
+                                    shape = CutCornerShape(4.dp),
+                                    contentPadding = PaddingValues(10.dp)
+                                ) {
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                         Text(
-                                            text = if (option.costCredits < 0) "AWARD: +${-option.costCredits} CREDITS" else "COST: ${option.costCredits} CREDITS",
+                                            text = option.text,
                                             fontFamily = FontFamily.Monospace,
-                                            fontSize = 8.sp,
-                                            color = if (option.costCredits < 0) MatrixGreen else CyberMagenta
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            textAlign = TextAlign.Center
                                         )
+                                        if (option.costCredits != 0) {
+                                            Text(
+                                                text = if (option.costCredits < 0) "AWARD: +${-option.costCredits} CREDITS" else "COST: ${option.costCredits} CREDITS",
+                                                fontFamily = FontFamily.Monospace,
+                                                fontSize = 8.sp,
+                                                color = if (option.costCredits < 0) MatrixGreen else CyberMagenta
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -4574,56 +4884,56 @@ fun CompanionDetailScreen(companion: CompanionState, state: GameUiState, viewMod
                     }
                 }
             }
-        }
 
-        Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
-        // Gift Replicator Interface
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .border(1.dp, CyberBorder, CutCornerShape(6.dp)),
-            colors = CardDefaults.cardColors(containerColor = CyberPanel),
-            shape = CutCornerShape(6.dp)
-        ) {
-            Column(modifier = Modifier.padding(10.dp)) {
-                Text(
-                    text = "GIFT REPLICATOR CORE // ENHANCE ALIGNMENT",
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        color = CyberAmber,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = FontFamily.Monospace,
-                        fontSize = 8.sp
-                    )
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "Synthesize specific item of interest: ${companion.giftType}",
-                    style = MaterialTheme.typography.bodySmall.copy(color = Color.Gray, fontSize = 10.sp)
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Button(
-                    onClick = { viewModel.replicateCompanionGift(companion.id) },
-                    enabled = state.credits >= 150 && companion.affinity < 5,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = CyberAmber.copy(alpha = 0.15f),
-                        contentColor = CyberAmber
-                    ),
-                    shape = CutCornerShape(4.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Redeem,
-                        contentDescription = "Gift",
-                        modifier = Modifier.size(14.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
+            // Gift Replicator Interface
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(1.dp, CyberBorder, CutCornerShape(6.dp)),
+                colors = CardDefaults.cardColors(containerColor = CyberPanel),
+                shape = CutCornerShape(6.dp)
+            ) {
+                Column(modifier = Modifier.padding(10.dp)) {
                     Text(
-                        text = if (companion.affinity >= 5) "ALIGNMENT MAXIMIZED" else "REPLICATE & PRESENT GIFT (-150 ⚿)",
-                        fontFamily = FontFamily.Monospace,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold
+                        text = "GIFT REPLICATOR CORE // ENHANCE ALIGNMENT",
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            color = CyberAmber,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = FontFamily.Monospace,
+                            fontSize = 8.sp
+                        )
                     )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Synthesize specific item of interest: ${companion.giftType}",
+                        style = MaterialTheme.typography.bodySmall.copy(color = Color.Gray, fontSize = 10.sp)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(
+                        onClick = { viewModel.replicateCompanionGift(companion.id) },
+                        enabled = state.credits >= 150 && companion.affinity < 5,
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = CyberAmber.copy(alpha = 0.15f),
+                            contentColor = CyberAmber
+                        ),
+                        shape = CutCornerShape(4.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Redeem,
+                            contentDescription = "Gift",
+                            modifier = Modifier.size(14.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = if (companion.affinity >= 5) "ALIGNMENT MAXIMIZED" else "REPLICATE & PRESENT GIFT (-150 ⚿)",
+                            fontFamily = FontFamily.Monospace,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
         }
@@ -5303,7 +5613,6 @@ fun LivingShipEcosystemTab(state: GameUiState, viewModel: GameViewModel) {
 
 @Composable
 fun PlantVisualStem(progress: Int, species: String) {
-    val progressFloat = progress / 100f
     val color = when (species) {
         "Neon Lotus" -> CyberCyan
         "Vivid Fern" -> Color(0xFF10B981)
@@ -5311,53 +5620,43 @@ fun PlantVisualStem(progress: Int, species: String) {
         else -> CyberAmber
     }
 
+    // Sapling -> mature growth-stage art (VisualAssets/LivingUniverse_Progression.png,
+    // QE_DEC_013/014/015) replacing the old Canvas-drawn stem/leaf-dot stand-in.
+    val stageDrawable = when {
+        progress >= 100 -> R.drawable.img_plant_mature
+        progress >= 30 -> R.drawable.img_plant_sprout
+        else -> R.drawable.img_plant_seed
+    }
+
     Box(
         modifier = Modifier
             .size(50.dp)
             .background(CyberObsidian, RoundedCornerShape(4.dp))
             .border(1.dp, CyberBorder, RoundedCornerShape(4.dp)),
-        contentAlignment = Alignment.BottomCenter
+        contentAlignment = Alignment.Center
     ) {
-        Canvas(modifier = Modifier.fillMaxSize().padding(4.dp)) {
-            val stemHeight = size.height * progressFloat * 0.8f
-            
-            // Draw Stem
-            drawLine(
-                color = Color(0xFF047857),
-                start = Offset(size.width / 2, size.height),
-                end = Offset(size.width / 2, size.height - stemHeight),
-                strokeWidth = 4f
+        if (progress >= 100) {
+            // Species-tinted bloom glow behind the mature sprite
+            Box(
+                modifier = Modifier
+                    .size(38.dp)
+                    .background(
+                        Brush.radialGradient(
+                            colors = listOf(color.copy(alpha = 0.45f), Color.Transparent)
+                        ),
+                        CircleShape
+                    )
             )
-
-            // Draw Leaves if grown
-            if (progress >= 30) {
-                drawCircle(
-                    color = Color(0xFF059669),
-                    radius = 4f,
-                    center = Offset(size.width / 2 - 6f, size.height - stemHeight * 0.5f)
-                )
-                drawCircle(
-                    color = Color(0xFF059669),
-                    radius = 4f,
-                    center = Offset(size.width / 2 + 6f, size.height - stemHeight * 0.7f)
-                )
-            }
-
-            if (progress >= 100) {
-                // Fully grown flower head!
-                drawCircle(
-                    color = color,
-                    radius = 8f,
-                    center = Offset(size.width / 2, size.height - stemHeight)
-                )
-                // Draw glow halo
-                drawCircle(
-                    color = color.copy(alpha = 0.3f),
-                    radius = 14f,
-                    center = Offset(size.width / 2, size.height - stemHeight)
-                )
-            }
         }
+
+        Image(
+            painter = painterResource(id = stageDrawable),
+            contentDescription = "$species growth stage",
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(4.dp),
+            contentScale = ContentScale.Fit
+        )
     }
 }
 
