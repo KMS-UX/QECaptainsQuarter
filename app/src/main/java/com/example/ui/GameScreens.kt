@@ -929,7 +929,8 @@ fun CabinView(state: GameUiState, viewModel: GameViewModel) {
         ) {
             InteractivePanelContainer(
                 title = getPanelTitle(state.activeNode),
-                onClose = { viewModel.setNode(CabinetNode.NONE) }
+                onClose = { viewModel.setNode(CabinetNode.NONE) },
+                iconRes = getPanelIcon(state.activeNode)
             ) {
                 when (state.activeNode) {
                     CabinetNode.WINDOW -> ObservationWindowPanel(state, viewModel)
@@ -1909,6 +1910,7 @@ fun HotspotNode(
 fun InteractivePanelContainer(
     title: String,
     onClose: () -> Unit,
+    iconRes: Int? = null,
     content: @Composable () -> Unit
 ) {
     Box(
@@ -1949,12 +1951,21 @@ fun InteractivePanelContainer(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            modifier = Modifier
-                                .size(10.dp)
-                                .clip(RoundedCornerShape(5.dp))
-                                .background(CyberCyan)
-                        )
+                        if (iconRes != null) {
+                            Image(
+                                painter = painterResource(id = iconRes),
+                                contentDescription = null,
+                                modifier = Modifier.size(28.dp),
+                                contentScale = ContentScale.Fit
+                            )
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .size(10.dp)
+                                    .clip(RoundedCornerShape(5.dp))
+                                    .background(CyberCyan)
+                            )
+                        }
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = title,
@@ -2014,6 +2025,69 @@ fun getPanelTitle(node: CabinetNode): String = when (node) {
     CabinetNode.PET_SANCTUARY -> "CYBER-PET FIRMWARE HARNESS"
     CabinetNode.ELEVATOR -> "QUANTUM TRANSIT LIFT"
     else -> "STARSHIP SYSTEM"
+}
+
+/** Reference-sheet icon (VisualAssets/QE_FUR_CON.png, CoffeeBrewingCycle.png) shown in the panel header, where one exists. */
+fun getPanelIcon(node: CabinetNode): Int? = when (node) {
+    CabinetNode.DESK -> R.drawable.img_icon_captain_desk
+    CabinetNode.AI -> R.drawable.img_icon_ai_core
+    CabinetNode.COFFEE -> R.drawable.img_icon_coffee_brewer
+    CabinetNode.BOOKSHELF -> R.drawable.img_icon_bookshelf
+    else -> null
+}
+
+/** Small furniture/console-icon banner used to give a detail panel a distinct visual identity. */
+@Composable
+fun PanelIconBanner(iconRes: Int, title: String, subtitle: String, accentColor: Color) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 12.dp)
+            .background(
+                Brush.horizontalGradient(listOf(accentColor.copy(alpha = 0.14f), Color.Transparent)),
+                RoundedCornerShape(8.dp)
+            )
+            .border(1.dp, accentColor.copy(alpha = 0.4f), RoundedCornerShape(8.dp))
+            .padding(10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(56.dp)
+                .background(CyberObsidian, RoundedCornerShape(6.dp))
+                .border(1.dp, accentColor.copy(alpha = 0.5f), RoundedCornerShape(6.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(id = iconRes),
+                contentDescription = title,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(6.dp),
+                contentScale = ContentScale.Fit
+            )
+        }
+        Spacer(modifier = Modifier.width(12.dp))
+        Column {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleSmall.copy(
+                    color = accentColor,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.Monospace,
+                    letterSpacing = 1.sp
+                )
+            )
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.labelSmall.copy(
+                    color = Color.Gray,
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 9.sp
+                )
+            )
+        }
+    }
 }
 
 // --- 6. OBSERVATION WINDOW DETAILED PANEL ---
@@ -2173,15 +2247,24 @@ fun CaptainDeskPanel(state: GameUiState, viewModel: GameViewModel) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "DAILY BRIEFING TERMINAL // DAY ${state.calendarDay}",
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            color = CyberAmber,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = FontFamily.Monospace,
-                            letterSpacing = 1.sp
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Image(
+                            painter = painterResource(id = R.drawable.img_icon_captain_desk),
+                            contentDescription = null,
+                            modifier = Modifier.size(26.dp),
+                            contentScale = ContentScale.Fit
                         )
-                    )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "DAILY BRIEFING TERMINAL // DAY ${state.calendarDay}",
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                color = CyberAmber,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = FontFamily.Monospace,
+                                letterSpacing = 1.sp
+                            )
+                        )
+                    }
                     Box(
                         modifier = Modifier
                             .background(CyberCyan.copy(alpha = 0.15f), RoundedCornerShape(4.dp))
@@ -3524,6 +3607,16 @@ fun AiTerminalPanel(state: GameUiState, viewModel: GameViewModel) {
                         )
                     )
                 }
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                // AI Core Console icon (VisualAssets/QE_FUR_CON.png, QE_CON_004_AICoreConsole)
+                Image(
+                    painter = painterResource(id = R.drawable.img_icon_ai_core),
+                    contentDescription = "AI Core Console",
+                    modifier = Modifier.size(40.dp).alpha(0.85f),
+                    contentScale = ContentScale.Fit
+                )
             }
         }
 
@@ -3721,6 +3814,13 @@ fun CoffeeCornerPanel(state: GameUiState, viewModel: GameViewModel) {
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
+        PanelIconBanner(
+            iconRes = R.drawable.img_icon_coffee_brewer,
+            title = "REPLICATOR & BREWING BAY",
+            subtitle = "Molecular synthesis online // select a formula below",
+            accentColor = CyberMagenta
+        )
+
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -3853,6 +3953,13 @@ fun BookshelfPanel(state: GameUiState, viewModel: GameViewModel) {
     var selectedCategory by remember { mutableStateOf(0) } // 0 = Factions, 1 = Systems, 2 = anomalies
 
     Column(modifier = Modifier.fillMaxSize()) {
+        PanelIconBanner(
+            iconRes = R.drawable.img_icon_bookshelf,
+            title = "STELLAR ENCYCLOPEDIA CODEX",
+            subtitle = "Archived factions, systems & anomaly records",
+            accentColor = CyberCyanDim
+        )
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
