@@ -2157,13 +2157,15 @@ fun getPanelTitle(node: CabinetNode): String = when (node) {
     else -> "STARSHIP SYSTEM"
 }
 
-/** Reference-sheet icon (VisualAssets/QE_FUR_CON.png, CoffeeBrewingCycle.png) shown in the panel header, where one exists. */
+/** Reference-sheet icon (VisualAssets/QE_FUR_CON.png, CoffeeBrewingCycle.png, QE_EXPAN_SEASONAL.png) shown in the panel header, where one exists. */
 fun getPanelIcon(node: CabinetNode): Int? = when (node) {
     CabinetNode.DESK -> R.drawable.img_icon_captain_desk
     CabinetNode.AI -> R.drawable.img_icon_ai_core
     CabinetNode.COFFEE -> R.drawable.img_icon_coffee_brewer
     CabinetNode.BOOKSHELF -> R.drawable.img_icon_bookshelf
     CabinetNode.DISPLAY_SHELF -> R.drawable.img_icon_display_shelf
+    CabinetNode.GREENHOUSE -> R.drawable.img_icon_holographic_planter
+    CabinetNode.PET_SANCTUARY -> R.drawable.img_icon_pet_dock
     else -> null
 }
 
@@ -2993,6 +2995,21 @@ fun LogItemCard(log: LogEntity, onDelete: () -> Unit) {
     }
 }
 
+/**
+ * Painted planet sprite (VisualAssets/GalaxyExploration.png, QE_ANI_006_Dynamic_Planet_Sprite)
+ * themed to each known sector's lore, used as the radar node icon instead of a flat color dot.
+ * Falls back to the nebula/rocky sprite for any future sector id not in `initialSectors`.
+ */
+fun getSectorPlanetIcon(sectorId: String): Int = when (sectorId) {
+    "home_port" -> R.drawable.img_sector_planet_home
+    "sigma_9" -> R.drawable.img_sector_planet_tech
+    "temple_core" -> R.drawable.img_sector_planet_sanctuary
+    "crevice" -> R.drawable.img_sector_planet_anomaly
+    "dark_nebula" -> R.drawable.img_sector_planet_nebula
+    "plasma_ridge" -> R.drawable.img_sector_planet_plasma
+    else -> R.drawable.img_sector_planet_nebula
+}
+
 @Composable
 fun GalaxyRadarSection(state: GameUiState, viewModel: GameViewModel) {
     val density = androidx.compose.ui.platform.LocalDensity.current
@@ -3093,6 +3110,21 @@ fun GalaxyRadarSection(state: GameUiState, viewModel: GameViewModel) {
                 shape = CutCornerShape(8.dp)
             ) {
                 Box(modifier = Modifier.fillMaxSize()) {
+                    // Painted circuit-hex starmap backdrop (VisualAssets/QE_AMB.png,
+                    // QE_ANI_006_Star_Map_Procedural_Hex) behind the live radar overlay,
+                    // replacing the previous flat CyberObsidian fill.
+                    Image(
+                        painter = painterResource(id = R.drawable.img_starmap_hex),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(CyberObsidian.copy(alpha = 0.55f))
+                    )
+
                     // Drawing dynamic radar rings, grid lines, and sweep sweep line
                     val infiniteTransition = rememberInfiniteTransition(label = "radar")
                     val angleSweep by infiniteTransition.animateFloat(
@@ -3191,12 +3223,13 @@ fun GalaxyRadarSection(state: GameUiState, viewModel: GameViewModel) {
                                     )
                             )
 
-                            // Core solid node dot
-                            Box(
-                                modifier = Modifier
-                                    .size(7.dp)
-                                    .clip(RoundedCornerShape(50))
-                                    .background(if (isSelected) CyberAmber else nodeColor)
+                            // Core node: a small painted planet sprite (VisualAssets/GalaxyExploration.png,
+                            // QE_ANI_006_Dynamic_Planet_Sprite) themed to the sector, replacing the old flat dot
+                            Image(
+                                painter = painterResource(id = getSectorPlanetIcon(sector.id)),
+                                contentDescription = null,
+                                modifier = Modifier.size(14.dp),
+                                contentScale = ContentScale.Fit
                             )
                         }
 
